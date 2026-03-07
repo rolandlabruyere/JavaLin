@@ -19,6 +19,9 @@
 CREATE DATABASE IF NOT EXISTS `trafoBuildDatabase` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `trafoBuildDatabase`;
 
+create USER IF NOT EXISTS 'administrator'@'localhost' IDENTIFIED BY 'P3n1sl@nD01||w2YNcM01';
+GRANT ALL PRIVILEGES ON trafoBuildDatabase.* TO 'administrator'@'localhost';
+
 -- Structuur van  tabel trafoBuildDatabase.tb100_htmlpaginas wordt geschreven
 CREATE TABLE IF NOT EXISTS `tb100_htmlpaginas` (
   `Id` varchar(50) NOT NULL,
