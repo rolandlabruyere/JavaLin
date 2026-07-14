@@ -1,44 +1,55 @@
 package org.RestServer;
 
 import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
 
 import javax.swing.*;
+
+import static org.RestServer.FuncsAndProcs.decodeBase64;
+
 import java.sql.SQLException;
 
 import static org.RestServer.FuncsAndProcs.decodeBase64;
 
+
 public class RestServer {
 
     public static void main(String[] args) throws Throwable {
-        var app = Javalin.create().start(7070);
-
-        app.get("/", ctx -> ctx.html(getRoot( "mainPage;splashPage", "home")));
-        app.get("/powertrafo/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "powertrafo")));
-        app.get("/filterchoke/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "filterchoke")));
-        app.get("/outputtrafo/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "outputtrafo")));
-        app.get("/download/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "download")));
-        app.get("/search/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "search")));
-        app.get("/contact/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "contact")));
-        app.get("/about/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "about")));
-        app.get("/faq/<ipaddress>", ctx -> ctx.html(startSession(ctx.pathParam("ipaddress"),"mainPage", "faq")));
-
+        Javalin.create(config -> {
+            //allow host crossover
+            config.bundledPlugins.enableCors(cors -> {cors.addRule(it ->{it.anyHost();});});
+            //add public folder to provide static files like css and js
+            config.staticFiles.add("/public", Location.CLASSPATH);
+            
+            //map get and post routes
+            config.routes.get("/" , ctx -> ctx.html(getRoot("indexPage")));
+            config.routes.get("/powertrafo" , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/filterchoke", ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/outputtrafo", ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/download"   , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/search"     , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/contact"    , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/about"      , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/home"       , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+        }).start(7070);
     }
 
-    private static String getRoot(String pageNames, String tabItem) {
+    private static String getRoot(String tabItem) {
         ConstructHtmlPages chp = new ConstructHtmlPages();
         try {
-            return chp.getHtmlPage(pageNames, tabItem);
+            return chp.getHtmlPage(tabItem);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
-    private static String startSession(String ipAddress, String pageNames, String tabItem) throws SQLException {
-        MySQL conn = new MySQL();
+
+    private static String startSession(String ipAddress, String tabItem) throws SQLException {
+        DbconCsales conn = new DbconCsales();
         ipAddress = decodeBase64(ipAddress);
         FuncsAndProcs fps = new FuncsAndProcs();
         conn.connect();
-       // conn.execSql("delete from tb900_sessionTracker where ipAddress = ?", ipAddress);
-        conn.execSql("insert into tb900_sessionTracker (ipAddress, timestampStart) values (?, ?)", ipAddress + ";" + fps.depositTimestamp(0));
-        return getRoot(pageNames, tabItem);
+        conn.execSql("insert into tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
+        return getRoot(tabItem);
     }
+
 }
