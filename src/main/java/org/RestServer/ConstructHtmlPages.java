@@ -1,15 +1,14 @@
-package org.RestServer;
+package org.restserver;
 
 import java.sql.ResultSet;
-//import java.sql.SQLException;
 
 public class ConstructHtmlPages {
-    DbconHpages myConn = new DbconHpages();
+    DbConnect myConn = new DbConnect();
     FuncsAndProcs fps = new FuncsAndProcs();
 
     public String getHtmlPage(String tabItem) throws Throwable {
         //String[] placeholders;
-        myConn.connect();
+        myConn.connect(1); 
         ResultSet rs = myConn.openSql("select * from tb100_htmlpaginas where id = ?", tabItem);
 
         rs.next();

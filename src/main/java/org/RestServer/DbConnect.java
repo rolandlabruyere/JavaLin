@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 
-public class DbConnection {
+public class DbConnect {
     static String[] connectionUrl = {"jdbc:mysql://localhost:3306/voorthuiscustomersales", "jdbc:mysql://localhost:3306/voorthuishtmlpages"};
     static Connection conn;
     FuncsAndProcs fps = new FuncsAndProcs();
