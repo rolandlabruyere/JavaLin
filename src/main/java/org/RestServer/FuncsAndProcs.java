@@ -1,4 +1,4 @@
-package org.RestServer;
+package org.restserver;
 
 import org.ini4j.Ini;
 import org.ini4j.Profile.Section;
@@ -17,9 +17,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.Base64;
-
-
-import static java.lang.Math.abs;
+//import static java.lang.Math.abs;
 
 public class FuncsAndProcs {
 
@@ -207,6 +205,7 @@ public class FuncsAndProcs {
             OutputStream outputFile = new FileOutputStream("src/output/response_" + namePart1 + "_" + namePart2 + "_" + namePart3 + ".json");
             byte[] bytes = textToWrite.getBytes();
             outputFile.write(bytes);
+            outputFile.close(); 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -223,7 +222,6 @@ public class FuncsAndProcs {
     public String depositTimestamp(Integer xDaysAgo) {
         //create test Timestamp
         xDaysAgo = xDaysAgo * -1;
-        String offset = "+0100";
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
         Date depositDate = subtractDay(Calendar.getInstance().getTime(), xDaysAgo);
@@ -440,28 +438,6 @@ public class FuncsAndProcs {
         saveIniValue("RunErrors", "emptyQueueError", "");
         saveIniValue("RunErrors", "loadedQueueError", "");
         saveIniValue("RunErrors", "fwVersionAssertError", "0");
-    }
-
-    public void copyFiles(String sourceFolder, String targetFolder) throws Throwable {
-        String command = "c:\\Git\\test-cucumber-metering\\moveDlFiles.cmd $source $target";
-        command = command
-                .replace("$source", sourceFolder)
-                .replace("$target", targetFolder);
-
-        Runtime.getRuntime().exec(command);
-        pauseExecution(500L);
-    }
-
-    public void useFileDlg(String filePath) throws Throwable {
-        String command = "handleDialog.cmd $title $file";
-        //filePath = StringUtils.repeat(" ", 68) + filePath;
-
-        command = command
-                .replace("$title", "Openen")
-                .replace("$file", filePath);
-
-        Runtime.getRuntime().exec(command);
-        pauseExecution(500L);
     }
 
     public void storeUser(String user) throws Throwable {

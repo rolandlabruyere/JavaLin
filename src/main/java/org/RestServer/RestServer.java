@@ -1,9 +1,8 @@
-package org.RestServer;
+package org.restserver;
 
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
-import javax.swing.*;
-import static org.RestServer.FuncsAndProcs.decodeBase64;
+import static org.restserver.FuncsAndProcs.decodeBase64;
 import java.sql.SQLException;
 
 public class RestServer {
@@ -39,10 +38,10 @@ public class RestServer {
     }
 
     private static String startSession(String ipAddress, String tabItem) throws SQLException {
-        DbconCsales conn = new DbconCsales();
+        DbConnect conn = new DbConnect();
         ipAddress = decodeBase64(ipAddress);
         FuncsAndProcs fps = new FuncsAndProcs();
-        conn.connect();
+        conn.connect(0); // Connect to the first database
         conn.execSql("insert into tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
         return getRoot(tabItem);
     }
