@@ -15,15 +15,17 @@ public class RestServer {
             config.staticFiles.add("/public", Location.CLASSPATH);
             
             //map get routes
-            config.routes.get("/" , ctx -> ctx.html(getRoot("indexPage")));
-            config.routes.get("/voedingstrafo" , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/smoorspoel"    , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/uitgangstrafo" , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/weetjes"       , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/search"        , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/contact"       , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/about"         , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
-            config.routes.get("/home"          , ctx -> ctx.html(startSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""))));
+            config.routes.get("/"                           , ctx -> ctx.html(getRoot("indexPage")));
+            config.routes.get("/voedingstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/smoorspoel"                 , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/uitgangstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/weetjes"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/search"                     , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/contact"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/about"                      , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/savePtrafoLayout/{value}"   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.pathParam("value"))));
+
             //map post routes
         }).start(7070);
     }
@@ -37,12 +39,23 @@ public class RestServer {
         }
     }
 
-    private static String startSession(String ipAddress, String tabItem) throws SQLException {
+    private static String trackSession(String ipAddress, String tabItem, String value) throws SQLException {
         DbConnect conn = new DbConnect();
         ipAddress = decodeBase64(ipAddress);
         FuncsAndProcs fps = new FuncsAndProcs();
-        conn.connect(0); // Connect to the first database
+        conn.connect(0); 
         conn.execSql("insert into tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
+        switch (tabItem) {
+            case "voedingstrafo"    -> getRoot(tabItem);
+            case "smoorspoel"       -> getRoot(tabItem);
+            case "uitgangstrafo"    -> getRoot(tabItem);
+            case "weetjes"          -> getRoot(tabItem);
+            case "search"           -> getRoot(tabItem);
+            case "contact"          -> getRoot(tabItem); 
+            case "about"            -> getRoot(tabItem);
+            case "home"             -> getRoot(tabItem);
+            case "savePtrafoLayout" -> getRoot(tabItem);  
+        }
         return getRoot(tabItem);
     }
 
