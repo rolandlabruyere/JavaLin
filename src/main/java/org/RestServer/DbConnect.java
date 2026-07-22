@@ -50,9 +50,19 @@ public class DbConnect {
         return ps.executeQuery();
     }
 
-    public String fetchSql(String selectQuery, String value, String columnLabel) throws SQLException {
+    public String fetchSql(String selectQuery, String valueString, String columnLabel) throws SQLException {
+        String[] values = valueString.split(";");
+        int count = StringUtils.countMatches(selectQuery, "?");
+
+        if (values.length != count){
+            throw new RuntimeException("The number of query parameters doesn't match the number of passed values.");
+        }
+
         PreparedStatement ps = conn.prepareStatement(selectQuery);
-        ps.setString(1, value);
+        for(int t = 0; t < values.length; t++) {
+            ps.setString(t + 1, values[t]);
+        }
+        assert ps != null;
 
         try {
             ResultSet rs = ps.executeQuery();
@@ -62,6 +72,7 @@ public class DbConnect {
             return e.getMessage();
         }
     }
+    
     public void close() throws SQLException {
         conn.close();
     }

@@ -2,6 +2,7 @@ package org.restserver;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.math.*;
 
 public class ConstructHtmlPages {
     DbConnect myConn = new DbConnect();
@@ -20,12 +21,25 @@ public class ConstructHtmlPages {
         myConn.close();
         return htmlPage;
     }
-    public String constructTrafoLayoutPage(String tabItem, int layOutValue) throws SQLException {
+    public String constructTrafoLayoutPage(String tabItem, Integer layOutValue) throws SQLException {
         myConn.connect(1); 
-        String htmlString = myConn.fetchSql("select * from tb120_html_snippets where id = ?", tabItem, "HtmlCode");
+        String htmlString = myConn.fetchSql("select * from tb120_html_snippets where id = ? and itemNr = 0", tabItem, "HtmlCode");
+
+        for (Integer i = 0; i < 7; i++) {
+            Integer bitValue = (int)Math.pow(2, i);
+            if((layOutValue & bitValue) == bitValue) {
+                htmlString = htmlString.replace("$snippet"+ bitValue +"$", getSnippet(tabItem, bitValue));
+            } else {
+                htmlString = htmlString.replace("$snippet"+ bitValue +"$", "");
+            }
+        }
 
         myConn.close();
         return htmlString;
+    }
+
+    private String getSnippet(String tabItem, Integer itemNr) throws SQLException {
+        return myConn.fetchSql("select * from tb120_html_snippets where id = ? and itemNr = ?", tabItem + ";" + itemNr.toString(), "HtmlCode");
     }
 
 }
