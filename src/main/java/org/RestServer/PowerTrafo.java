@@ -1,5 +1,7 @@
 package org.restserver;
 import java.sql.SQLException;
+import static org.restserver.FuncsAndProcs.decodeBase64;
+
 
 public class PowerTrafo  {
     DbConnect myConn = new DbConnect();
@@ -15,6 +17,19 @@ public class PowerTrafo  {
         myConn.execSql("insert into tb910_temp_trafo_settings values (?, ?, ?, ?, ?)", ipAddress + ";1;" + tabItem + ";" + value.toString() + ";" + fps.depositTimestamp(0));
         return chp.constructTrafoLayoutPage(tabItem, value);
     }
+
+    public String postPowerTrafoSpecs(String tabItem, String ipAddress, String valueString) throws SQLException {
+        myConn.connect(0); 
+        String decodedValues = decodeBase64(valueString);
+        String[] value = decodedValues.split("&");
+
+        //initialize a new power trafo for this ip 
+        myConn.execSql("insert into tb200_power_trafo_config (ip, trafoNum, timestamp) values (?, ?, ?)", ipAddress + ";" + getNextNumber(tabItem) + ";" + fps.depositTimestamp(0));
+        return "done";
+        }
+
+
+
 
     public String getNextNumber(String tabItem) throws SQLException {
         myConn.connect(1); 
