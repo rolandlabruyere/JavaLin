@@ -29,9 +29,6 @@ public class PowerTrafo  {
         return "done";
         }
 
-
-
-
     public String getNextNumber(String tabItem) throws SQLException {
         myConn.connect(1); 
         String dateString = fps.depositTimestamp(0);
