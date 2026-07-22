@@ -1,14 +1,19 @@
 package org.restserver;
 import java.sql.SQLException;
 
-public class PowerTrafo {
+public class PowerTrafo  {
     DbConnect myConn = new DbConnect();
     FuncsAndProcs fps = new FuncsAndProcs();
+    ConstructHtmlPages chp = new ConstructHtmlPages();
+    /*
+        0 = connect to the customer sales database
+        1 = connect to the html pages database
+    */
     
-    public String savePowerTrafoLayout(String ipAddress, Integer value) throws SQLException {
+    public String powerTrafoLayout(String tabItem, String ipAddress, Integer value) throws SQLException {
         myConn.connect(0); 
-        String layout = myConn.fetchSql("select layout from tb980_powertrafo_layout where ipAddress = ?", ipAddress, "layout");
-        return layout;
+        myConn.execSql("insert into tb910_temp_trafo_settings values (?, ?, ?, ?, ?)", ipAddress + ";1;" + tabItem + ";" + value.toString() + ";" + fps.depositTimestamp(0));
+        return chp.constructTrafoLayoutPage(tabItem, value);
     }
     
 }
