@@ -50,7 +50,7 @@ public class DbConnect {
         return ps.executeQuery();
     }
 
-    public String fetchSql(String selectQuery, String value, String columnLabel) throws Throwable {
+    public String fetchSql(String selectQuery, String value, String columnLabel) throws SQLException {
         PreparedStatement ps = conn.prepareStatement(selectQuery);
         ps.setString(1, value);
 

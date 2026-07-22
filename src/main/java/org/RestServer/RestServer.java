@@ -43,6 +43,8 @@ public class RestServer {
         DbConnect conn = new DbConnect();
         ipAddress = decodeBase64(ipAddress);
         FuncsAndProcs fps = new FuncsAndProcs();
+        PowerTrafo pt = new PowerTrafo();
+
         conn.connect(0); 
         conn.execSql("insert into tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
         switch (tabItem) {
@@ -54,7 +56,7 @@ public class RestServer {
             case "contact"          -> getRoot(tabItem); 
             case "about"            -> getRoot(tabItem);
             case "home"             -> getRoot(tabItem);
-            case "savePtrafoLayout" -> getRoot(tabItem);  
+            case "savePtrafoLayout" -> pt.savePowerTrafoLayout(ipAddress, Integer.valueOf(value));
         }
         return getRoot(tabItem);
     }
