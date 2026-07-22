@@ -2,7 +2,6 @@ package org.restserver;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.math.*;
 
 public class ConstructHtmlPages {
     DbConnect myConn = new DbConnect();
