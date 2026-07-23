@@ -47,7 +47,7 @@ public class PowerTrafo  {
 
         //remove the temporary settings for this ip address
         conn.execSql("delete from voorthuiscustomersales.tb910_temp_trafo_settings where ip = ? and part = ?", ipAddress + ";1");
-        return "/now finalizing calculations";
+        return conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" ,"InlineHtml" );
         }
 
     public String getNextNumber(String tabItem) throws SQLException {
