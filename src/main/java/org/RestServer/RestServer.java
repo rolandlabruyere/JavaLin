@@ -27,7 +27,7 @@ public class RestServer {
             config.routes.get("/powerTrafoLayout/{value}"   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", "").replace(ctx.pathParam("value"), ""), ctx.pathParam("value"))));
 
             //map post routes
-            config.routes.post("/postPowerTrafoSpecs"       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("values"))));
+            config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("values"))));
         }).start(7070);
     }
 
@@ -59,7 +59,7 @@ public class RestServer {
             case "about"                -> resultHtml = getRoot(tabItem);
             case "home"                 -> resultHtml = getRoot(tabItem);
             case "powerTrafoLayout"     -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
-            case "postPowerTrafoSpecs"  -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
+            case "powertrafo"           -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
        }
         return resultHtml;
     }

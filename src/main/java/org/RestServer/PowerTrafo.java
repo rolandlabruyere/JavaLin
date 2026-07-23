@@ -22,10 +22,31 @@ public class PowerTrafo  {
         DbConnect conn = new DbConnect();
         conn.connect(0); 
         String decodedValues = decodeBase64(valueString);
-        String[] value = decodedValues.split("&");
+        String[] values = decodedValues.split("&");
+        String trafoNumber = getNextNumber(tabItem);
+        Integer layOutValue = Integer.valueOf(conn.fetchSql("select * from voorthuiscustomersales.tb910_temp_trafo_settings where ip = ? and part = ?", ipAddress + ";1", "CommonValues"));
 
         //initialize a new power trafo for this ip 
-        conn.execSql("insert into voorthuiscustomersales.tb200_power_trafo_config (ip, trafoNum, timestamp) values (?, ?, ?)", ipAddress + ";" + getNextNumber(tabItem) + ";" + fps.depositTimestamp(0));
+        conn.execSql("insert into voorthuiscustomersales.tb200_power_trafo_config (ip, trafoNum, timestamp) values (?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + fps.depositTimestamp(0));
+
+        //first insert the boolean values into the database
+        for (Integer i = 0; i < 7; i++) {
+            switch (layOutValue & (int)Math.pow(2, i)) {
+                case 1  -> conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set secundary = true where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+                case 2  -> conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set centertap = true where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+                case 32 -> conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set filamentCenterTap = true where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+                case 64 -> conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set tapFiftyVolt = true where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+            };
+        }
+
+        //then insert the other values into the database
+        for (String value : values) {
+            String[] keyValue = value.split("=");
+            conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set " + keyValue[0] + " = " + keyValue[1] + " where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+        }
+
+        //remove the temporary settings for this ip address
+        conn.execSql("delete from voorthuiscustomersales.tb910_temp_trafo_settings where ip = ? and part = ?", ipAddress + ";1");
         return "done";
         }
 
