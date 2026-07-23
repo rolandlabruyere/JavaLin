@@ -16,28 +16,19 @@ public class RestServer {
             
             //map get routes
             config.routes.get("/"                           , ctx -> ctx.html(getRoot("indexPage")));
-            config.routes.get("/voedingstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/smoorspoel"                 , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/uitgangstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/weetjes"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/search"                     , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/contact"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/about"                      , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/powerTrafoLayout/{value}"   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", "").replace(ctx.pathParam("value"), ""), ctx.pathParam("value"))));
+            config.routes.get("/voedingstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/smoorspoel"                 , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/uitgangstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/weetjes"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/search"                     , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/contact"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/about"                      , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), "")));
+            config.routes.get("/powerTrafoLayout/{value}"   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path(), ctx.pathParam("value"))));
 
             //map post routes
             config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("values"))));
         }).start(7070);
-    }
-
-    private static String getRoot(String tabItem) {
-        ConstructHtmlPages chp = new ConstructHtmlPages();
-        try {
-            return chp.getHtmlPage(tabItem);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static String trackSession(String ipAddress, String tabItem, String value) throws SQLException {
@@ -46,6 +37,14 @@ public class RestServer {
         FuncsAndProcs fps = new FuncsAndProcs();
         PowerTrafo pt = new PowerTrafo();
         String resultHtml = "";
+
+        try {
+            String[] hulp = tabItem.split("/");
+            tabItem = hulp[1];
+        }catch (ArrayIndexOutOfBoundsException e){
+            tabItem = "";
+            System.exit(0);
+        }
 
         conn.connect(0); 
         conn.execSql("insert into tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
@@ -62,6 +61,15 @@ public class RestServer {
             case "powertrafo"           -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
        }
         return resultHtml;
+    }
+
+    private static String getRoot(String tabItem) {
+        ConstructHtmlPages chp = new ConstructHtmlPages();
+        try {
+            return chp.getHtmlPage(tabItem);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

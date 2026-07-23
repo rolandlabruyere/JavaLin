@@ -264,11 +264,10 @@ public class FuncsAndProcs {
     public String formatNumber(Integer num) {
         String hulp = num.toString();
         switch (hulp.length()) {
-            case 5 -> hulp = "0" + hulp;
-            case 4 -> hulp = "00" + hulp;
-            case 3 -> hulp = "000" + hulp;
-            case 2 -> hulp = "0000" + hulp;
-            case 1 -> hulp = "00000" + hulp;
+            case 4 -> hulp = "0" + hulp;
+            case 3 -> hulp = "00" + hulp;
+            case 2 -> hulp = "000" + hulp;
+            case 1 -> hulp = "0000" + hulp;
         }
         return hulp;
     }
