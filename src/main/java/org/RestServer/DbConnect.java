@@ -69,7 +69,7 @@ public class DbConnect {
             rs.next();
             return rs.getString(columnLabel);
         }catch (SQLException e){
-            return e.getMessage();
+            throw new RuntimeException(e.getMessage());
         }
     }
     

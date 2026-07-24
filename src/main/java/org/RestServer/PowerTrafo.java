@@ -4,7 +4,6 @@ import static org.restserver.FuncsAndProcs.decodeBase64;
 
 
 public class PowerTrafo  {
-    DbConnect myConn = new DbConnect();
     FuncsAndProcs fps = new FuncsAndProcs();
     ConstructHtmlPages chp = new ConstructHtmlPages();
     /*
@@ -13,8 +12,9 @@ public class PowerTrafo  {
     */
     
     public String powerTrafoLayout(String tabItem, String ipAddress, Integer value) throws SQLException {
+        DbConnect myConn = new DbConnect();
         myConn.connect(0); 
-        myConn.execSql("insert into tb910_temp_trafo_settings values (?, ?, ?, ?, ?)", ipAddress + ";1;" + tabItem + ";" + value.toString() + ";" + fps.depositTimestamp(0));
+        myConn.execSql("insert into voorthuiscustomersales.tb910_temp_trafo_settings values (?, ?, ?, ?, ?)", ipAddress + ";1;" + tabItem + ";" + value.toString() + ";" + fps.depositTimestamp(0));
         return chp.constructTrafoLayoutPage(tabItem, value);
     }
 
@@ -45,24 +45,52 @@ public class PowerTrafo  {
             conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set " + keyValue[0] + " = " + keyValue[1] + " where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
         }
 
+        //double voltage to adjust to "Fender style" full bridge rectifier
+        conn.execSql("update voorthuiscustomersales.tb200_power_trafo_config set volts = volts * 2 where ip = ? and trafoNum = ? and centerTap = true ", ipAddress + ";" + trafoNumber);
+
         //remove the temporary settings for this ip address
         conn.execSql("delete from voorthuiscustomersales.tb910_temp_trafo_settings where ip = ? and part = ?", ipAddress + ";1");
-        return conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" ,"InlineHtml" );
-        }
+        return calcPowerTrafo(tabItem, ipAddress, trafoNumber);
+    }
 
-    public String getNextNumber(String tabItem) throws SQLException {
+
+    /*************************************************************************************************
+     *    private functions
+     * ***********************************************************************************************/
+
+    // calculate the actual trafo
+    private String calcPowerTrafo(String tabItem, String ipAdress, String trafoNumber) throws SQLException{
+        DbConnect conn = new DbConnect();
+        conn.connect(0); 
+        String mainHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
+        String placeHoldersAll = getPlaceholders(tabItem);
+        String placeBoolsAll   = getPlaceholders(tabItem + "_bools");
+        String[] placeHolders = placeHoldersAll.split("|");
+        String[] placeBools = placeBoolsAll.split("|");
+    
+        return mainHtml;
+    }
+
+    private String getNextNumber(String tabItem) throws SQLException {
+        DbConnect myConn = new DbConnect();
         myConn.connect(1); 
         String dateString = fps.depositTimestamp(0);
         String mYear = dateString.substring(0, 4);
         String mMonth = dateString.substring(5, 7);
 
-        String trafoNumber = myConn.fetchSql("select * from tb900_numberstabel where itemtype = ?", tabItem, "itemNumber");
+        String trafoNumber = myConn.fetchSql("select * from voorthuishtmlpages.tb900_numberstabel where itemtype = ?", tabItem, "itemNumber");
         String formattedTrafoNumber =  mYear + mMonth + fps.formatNumber(Integer.parseInt(trafoNumber));
 
         myConn.execSql("delete from tb900_numberstabel where itemType = ?", tabItem);
         myConn.execSql("insert into tb900_numberstabel values (?, ?, ?, ?)", tabItem + ";" + mYear + ";" + mMonth + ";" + (Integer.parseInt(trafoNumber) + 1));
 
         return formattedTrafoNumber;
+    }
+
+    private String getPlaceholders(String searchItem) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        myConn.connect(1); 
+        return myConn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", searchItem, "placeHolderString");
     }
     
 }
