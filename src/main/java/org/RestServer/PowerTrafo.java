@@ -62,14 +62,33 @@ public class PowerTrafo  {
     private String calcPowerTrafo(String tabItem, String ipAdress, String trafoNumber) throws SQLException{
         DbConnect conn = new DbConnect();
         conn.connect(0); 
+
+        //the main html page is containing several placeholders, which are going to be replaced by this function 
         String mainHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
+
+        //iniatilize the key variables
         String placeHoldersAll = getPlaceholders(tabItem);
         String rowHideBoolsAll   = getPlaceholders(tabItem + "_bools");
         String[] placeHolders = placeHoldersAll.split("|");
         String[] rowHideBools = rowHideBoolsAll.split("|");
         String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.tb200_power_trafo_config where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
-    
-        return trafoValues[4];
+
+        Float secVoltage    = Float.parseFloat(trafoValues[3]);
+        Float secMilliAmps  = Float.parseFloat(trafoValues[4]);
+        int   secCenterTap  = Integer.parseInt(trafoValues[5]);
+        int   tapFiftyVolt  = Integer.parseInt(trafoValues[6]);
+        Float filFiveAmps   = Float.parseFloat(trafoValues[7]);
+        Float filSixAmps    = Float.parseFloat(trafoValues[8]);
+        Float filTwelveAmps = Float.parseFloat(trafoValues[9]);
+        int   filCenterTap  = Integer.parseInt(trafoValues[10]);
+
+        String[] hulpArray = getGridValues(ipAdress);
+        Float primVoltage = Float.parseFloat(hulpArray[0]);
+        Float primFreq    = Float.parseFloat(hulpArray[1]);
+
+
+
+        return primVoltage.toString();
     }
 
     private String getNextNumber(String tabItem) throws SQLException {
@@ -92,6 +111,23 @@ public class PowerTrafo  {
         DbConnect myConn = new DbConnect();
         myConn.connect(1); 
         return myConn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", searchItem, "placeHolderString");
+    }
+
+    private String[] getGridValues(String myIp) throws SQLException{
+        DbConnect myConn = new DbConnect();
+        String[] columns = new String[2];
+        myConn.connect(0);
+
+        try{ 
+            String[] hulp = myConn.fetchSql("select * from voorthuiscustomersales.tb930_grid_settings_per_ip where Ip = ?", myIp);
+            columns[0] = hulp[1];
+            columns[1] = hulp[2];
+        } catch (Exception e){
+            String[] hulp = myConn.fetchSql("select * from voorthuiscustomersales.tb930_grid_settings_per_ip where Ip = ?", "localhost");
+            columns[0] = hulp[1];
+            columns[1] = hulp[2];
+        }
+        return columns;
     }
     
 }
