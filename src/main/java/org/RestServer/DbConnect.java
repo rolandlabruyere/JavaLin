@@ -50,6 +50,7 @@ public class DbConnect {
         return ps.executeQuery();
     }
 
+    //overloaded procedure fetchSql which returns only one column or all comumns in a record
     public String fetchSql(String selectQuery, String valueString, String columnLabel) throws SQLException {
         String[] values = valueString.split(";");
         int count = StringUtils.countMatches(selectQuery, "?");
@@ -73,6 +74,37 @@ public class DbConnect {
         }
     }
     
+    public String[] fetchSql(String selectQuery, String valueString) throws SQLException {
+        String[] values = valueString.split(";");
+        int colCount = 0;
+        int count = StringUtils.countMatches(selectQuery, "?");
+
+        if (values.length != count){
+            throw new RuntimeException("The number of query parameters doesn't match the number of passed values.");
+        }
+
+        PreparedStatement ps = conn.prepareStatement(selectQuery);
+        for(int t = 0; t < values.length; t++) {
+            ps.setString(t + 1, values[t]);
+        }
+        assert ps != null;
+
+        try {
+            ResultSet rs = ps.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            colCount = rsmd.getColumnCount();
+            String[] columns = new String[colCount];
+
+            rs.next();
+            for (int i = 0; i < colCount - 1; i++){
+                columns[i] = rs.getString(i + 1);
+            }
+            return columns;
+        }catch (SQLException e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public void close() throws SQLException {
         conn.close();
     }

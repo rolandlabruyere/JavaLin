@@ -64,11 +64,12 @@ public class PowerTrafo  {
         conn.connect(0); 
         String mainHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
         String placeHoldersAll = getPlaceholders(tabItem);
-        String placeBoolsAll   = getPlaceholders(tabItem + "_bools");
+        String rowHideBoolsAll   = getPlaceholders(tabItem + "_bools");
         String[] placeHolders = placeHoldersAll.split("|");
-        String[] placeBools = placeBoolsAll.split("|");
+        String[] rowHideBools = rowHideBoolsAll.split("|");
+        String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.tb200_power_trafo_config where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
     
-        return mainHtml;
+        return trafoValues[4];
     }
 
     private String getNextNumber(String tabItem) throws SQLException {
