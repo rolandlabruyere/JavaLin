@@ -87,14 +87,14 @@ public class PowerTrafo  {
         Float primVoltage   = Float.parseFloat(trafoValues[11]);
         Float primFreq      = Float.parseFloat(trafoValues[12]);
 
-        Float primaryVa = getSumVASecundary(ipAdress, trafoNumber);
-        Float primaryAmps = primaryVa / primVoltage;
-        Float coreArea = (float) Math.sqrt(primaryVa) * 1.15f;
+        Float primaryVA = getSumVASecundary(ipAdress, trafoNumber);
+        Float primaryAmps = primaryVA / primVoltage;
+        Float coreArea = (float) Math.sqrt(primaryVA) * 1.15f;
         Float turnsPerVolt = primFreq/coreArea;  
         Float primWireSize = getWireSize(primaryVA, primVoltage);
 
 
-        return primFreq.toString();
+        return primWireSize.toString();
     }
 
     private String getNextNumber(String tabItem) throws SQLException {
@@ -107,8 +107,8 @@ public class PowerTrafo  {
         String trafoNumber = myConn.fetchSql("select * from voorthuishtmlpages.tb900_numberstabel where itemtype = ?", tabItem, "itemNumber");
         String formattedTrafoNumber =  mYear + mMonth + fps.formatNumber(Integer.parseInt(trafoNumber));
 
-        myConn.execSql("delete from tb900_numberstabel where itemType = ?", tabItem);
-        myConn.execSql("insert into tb900_numberstabel values (?, ?, ?, ?)", tabItem + ";" + mYear + ";" + mMonth + ";" + (Integer.parseInt(trafoNumber) + 1));
+        myConn.execSql("delete from voorthuishtmlpages.tb900_numberstabel where itemType = ?", tabItem);
+        myConn.execSql("insert into voorthuishtmlpages.tb900_numberstabel values (?, ?, ?, ?)", tabItem + ";" + mYear + ";" + mMonth + ";" + (Integer.parseInt(trafoNumber) + 1));
 
         return formattedTrafoNumber;
     }
@@ -134,7 +134,7 @@ public class PowerTrafo  {
         DbConnect myConn = new DbConnect();
         myConn.connect(0);
 
-        String[] result = myConn.fetchSql("select * from vw205_power_trafo_all where ip = ? and trafoNum = ?", myIp + ";" + trafoNum);
+        String[] result = myConn.fetchSql("select * from voorthuiscustomersales.vw205_power_trafo_all where ip = ? and trafoNum = ?", myIp + ";" + trafoNum);
         Float primVa = Float.parseFloat(result[3]) * Float.parseFloat(result[4]) / 1000; 
               primVa = primVa + Float.parseFloat(result[7]) * 5; 
               primVa = primVa + Float.parseFloat(result[8]) * 6.3f;
@@ -144,9 +144,13 @@ public class PowerTrafo  {
         return primVa;
     }
 
-    private float getWireSize(Float primaryVA, Float primVoltage){
+    private float getWireSize(Float power, Float voltage) throws SQLException{
+        DbConnect myConn = new DbConnect();
+        myConn.connect(1);
+        Float current = power /voltage; 
 
-        return 0.00f;
+        String result = myConn.fetchSql("select min(diameter) as wireSize from voorthuishtmlpages.tb230_draad_metrisch where MaxAmp >= ?", current.toString(), "wireSize");
+        return Float.parseFloat(result);
     };
 
     /*
