@@ -50,7 +50,7 @@ public class DbConnect {
         return ps.executeQuery();
     }
 
-    //overloaded procedure fetchSql which returns only one column or all comumns in a record
+    //overloaded procedure fetchSql which returns only one column
     public String fetchSql(String selectQuery, String valueString, String columnLabel) throws SQLException {
         String[] values = valueString.split(";");
         int count = StringUtils.countMatches(selectQuery, "?");
@@ -74,6 +74,7 @@ public class DbConnect {
         }
     }
     
+    // or it returns all columns in that one record
     public String[] fetchSql(String selectQuery, String valueString) throws SQLException {
         String[] values = valueString.split(";");
         int colCount = 0;
@@ -89,17 +90,42 @@ public class DbConnect {
         }
         assert ps != null;
 
+            try {
+                ResultSet rs = ps.executeQuery();
+                ResultSetMetaData rsmd = rs.getMetaData();
+                colCount = rsmd.getColumnCount();
+                String[] columns = new String[colCount];
+
+                rs.next();
+                for (int i = 0; i < colCount; i++){
+                    columns[i] = rs.getString(i + 1);
+                }
+                return columns;
+            }catch (SQLException e){
+                throw new RuntimeException(e.getMessage());
+            }
+    }
+
+    public int recordCount(String selectQuery, String valueString) throws SQLException{
+        String[] values = valueString.split(";");
+
+        if(selectQuery.contains("*")){
+            selectQuery.replace("*", "count(*)");
+        } else{
+            throw new RuntimeException("Please make sure the query contains a common asterisk wildcard");
+        }
+
+        PreparedStatement ps = conn.prepareStatement(selectQuery);
+        for(int t = 0; t < values.length; t++) {
+            ps.setString(t + 1, values[t]);
+        }
+        assert ps != null;
+
+
         try {
             ResultSet rs = ps.executeQuery();
-            ResultSetMetaData rsmd = rs.getMetaData();
-            colCount = rsmd.getColumnCount();
-            String[] columns = new String[colCount];
-
             rs.next();
-            for (int i = 0; i < colCount - 1; i++){
-                columns[i] = rs.getString(i + 1);
-            }
-            return columns;
+            return rs.getInt(1);
         }catch (SQLException e){
             throw new RuntimeException(e.getMessage());
         }

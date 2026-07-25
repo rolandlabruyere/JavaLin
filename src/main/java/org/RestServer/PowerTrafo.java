@@ -1,7 +1,7 @@
 package org.restserver;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import static org.restserver.FuncsAndProcs.decodeBase64;
-
 
 public class PowerTrafo  {
     FuncsAndProcs fps = new FuncsAndProcs();
@@ -25,6 +25,9 @@ public class PowerTrafo  {
         String[] values = decodedValues.split("&");
         String trafoNumber = getNextNumber(tabItem);
         Integer layOutValue = Integer.valueOf(conn.fetchSql("select * from voorthuiscustomersales.tb910_temp_trafo_settings where ip = ? and part = ?", ipAddress + ";1", "CommonValues"));
+
+        //check for grid settings on this ip, otherwise create them
+        checkGridEntry(ipAddress);
 
         //initialize a new power trafo for this ip 
         conn.execSql("insert into voorthuiscustomersales.tb200_power_trafo_config (ip, trafoNum, timestamp) values (?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + fps.depositTimestamp(0));
@@ -71,7 +74,7 @@ public class PowerTrafo  {
         String rowHideBoolsAll   = getPlaceholders(tabItem + "_bools");
         String[] placeHolders = placeHoldersAll.split("|");
         String[] rowHideBools = rowHideBoolsAll.split("|");
-        String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.tb200_power_trafo_config where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
+        String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.vw205_power_trafo_all where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
 
         Float secVoltage    = Float.parseFloat(trafoValues[3]);
         Float secMilliAmps  = Float.parseFloat(trafoValues[4]);
@@ -81,14 +84,17 @@ public class PowerTrafo  {
         Float filSixAmps    = Float.parseFloat(trafoValues[8]);
         Float filTwelveAmps = Float.parseFloat(trafoValues[9]);
         int   filCenterTap  = Integer.parseInt(trafoValues[10]);
+        Float primVoltage   = Float.parseFloat(trafoValues[11]);
+        Float primFreq      = Float.parseFloat(trafoValues[12]);
 
-        String[] hulpArray = getGridValues(ipAdress);
-        Float primVoltage = Float.parseFloat(hulpArray[0]);
-        Float primFreq    = Float.parseFloat(hulpArray[1]);
+        Float primaryVa = getSumVASecundary(ipAdress, trafoNumber);
+        Float primaryAmps = primaryVa / primVoltage;
+        Float coreArea = (float) Math.sqrt(primaryVa) * 1.15f;
+        Float turnsPerVolt = primFreq/coreArea;  
+        Float primWireSize = getWireSize(primaryVA, primVoltage);
 
 
-
-        return primVoltage.toString();
+        return primFreq.toString();
     }
 
     private String getNextNumber(String tabItem) throws SQLException {
@@ -113,21 +119,85 @@ public class PowerTrafo  {
         return myConn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", searchItem, "placeHolderString");
     }
 
-    private String[] getGridValues(String myIp) throws SQLException{
+    private void checkGridEntry(String myIp) throws SQLException{
         DbConnect myConn = new DbConnect();
-        String[] columns = new String[2];
         myConn.connect(0);
 
         try{ 
-            String[] hulp = myConn.fetchSql("select * from voorthuiscustomersales.tb930_grid_settings_per_ip where Ip = ?", myIp);
-            columns[0] = hulp[1];
-            columns[1] = hulp[2];
+            myConn.fetchSql("select * from voorthuiscustomersales.tb930_grid_settings_per_ip where Ip = ?", myIp);
         } catch (Exception e){
-            String[] hulp = myConn.fetchSql("select * from voorthuiscustomersales.tb930_grid_settings_per_ip where Ip = ?", "localhost");
-            columns[0] = hulp[1];
-            columns[1] = hulp[2];
+            myConn.execSql("insert into voorthuiscustomersales.tb930_grid_settings_per_ip values(?, ?, ?, ?)", myIp + ";230;50;" + fps.depositTimestamp(0));
         }
-        return columns;
     }
+
+    private Float getSumVASecundary(String myIp, String trafoNum) throws SQLException{
+        DbConnect myConn = new DbConnect();
+        myConn.connect(0);
+
+        String[] result = myConn.fetchSql("select * from vw205_power_trafo_all where ip = ? and trafoNum = ?", myIp + ";" + trafoNum);
+        Float primVa = Float.parseFloat(result[3]) * Float.parseFloat(result[4]) / 1000; 
+              primVa = primVa + Float.parseFloat(result[7]) * 5; 
+              primVa = primVa + Float.parseFloat(result[8]) * 6.3f;
+              primVa = primVa + Float.parseFloat(result[9]) * 12.8f;
+              primVa = primVa/0.9f; 
+
+        return primVa;
+    }
+
+    private float getWireSize(Float primaryVA, Float primVoltage){
+
+        return 0.00f;
+    };
+
+    /*
+      function getWireSize(primVa, primVoltage: single): single; overload;
+  var
+    thisQuery: tAdoQuery;
+    current: single;
+  begin
+    thisQuery := tAdoQuery.Create(nil);
+    current := primVA / primVoltage;
+    result := 0;
+
+    with thisQuery do begin
+      connection := form1.adoConnHtmlPages;
+      SQL.add('select min(diameter) from tb230_draad_metrisch where MaxAmp >= :amperage');
+      Parameters.ParamByName('amperage').Value := current;
+      try
+        Open;
+        Result := fields[0].AsFloat;
+      except
+        on E:exception do writelog(E.Message);
+      end;
+    end;
+  end;
+
+  function getWireSize(secAmps: single; isMilliAmps: boolean): single; overload;
+  var
+    thisQuery: tAdoQuery;
+    current: single;
+  begin
+    thisQuery := tAdoQuery.Create(nil);
+    result := 0;
+
+    if isMilliAmps then
+      current := secAmps / 1000
+    else
+      current := secAmps;
+
+    with thisQuery do begin
+      connection := form1.adoConnHtmlPages;
+      SQL.add('select min(diameter) from tb230_draad_metrisch where MaxAmp >= :amperage');
+      Parameters.ParamByName('amperage').Value := current;
+      try
+        Open;
+        Result := fields[0].AsFloat;
+      except
+        on E:exception do writelog(E.Message);
+      end;
+    end;
+  end;
+
+    */
     
 }
