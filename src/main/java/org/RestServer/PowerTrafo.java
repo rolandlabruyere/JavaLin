@@ -187,7 +187,11 @@ public class PowerTrafo  {
           itemValues[18] =  "0.00";
          } else {exportHtml.replace(rowHideBools[5], "");}
 
-         return primWireSize.toString();
+         if (saveCalculatedTrafoSpecs(ipAdress, trafoNumber, itemValues)) {
+            return exportHtml;
+        } else {
+            return "failed to save power trafo";
+        }
     }
 
     private String getNextNumber(String tabItem) throws SQLException {
@@ -275,4 +279,25 @@ public class PowerTrafo  {
            throw new RuntimeException("no suitable sheets found for these values");
         }
     }
+
+    private Boolean saveCalculatedTrafoSpecs(String ipAddress, String trafoNumber, String[] allValues) throws SQLException {
+        boolean result = false;
+        String valueString = ipAddress + ";" + trafoNumber + ";";
+        DbConnect myConn = new DbConnect();
+        myConn.connect(0);
+
+        myConn.execSql("delete from tb210_power_trafo_calcspecs where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+
+        for (String value: allValues){
+            valueString += value + ";"; 
+        }
+        valueString += fps.depositTimestamp(0);
+        try{
+            myConn.execSql("insert into tb210_power_trafo_calcspecs values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", valueString);
+            result = true;
+        } catch(Exception e){result = false;}
+        
+        return result;
+    }
+
 }
