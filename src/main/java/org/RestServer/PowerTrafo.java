@@ -1,11 +1,14 @@
 package org.restserver;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import static org.restserver.FuncsAndProcs.decodeBase64;
 
 public class PowerTrafo  {
     FuncsAndProcs fps = new FuncsAndProcs();
     ConstructHtmlPages chp = new ConstructHtmlPages();
+    static final Float filamentFiveVolts = 5f;
+    static final Float filamentSixVolts = 6.3f;
+    static final Float filamentTwelveVolts = 12.6f;
+
     /*
         0 = connect to the customer sales database
         1 = connect to the html pages database
@@ -64,10 +67,11 @@ public class PowerTrafo  {
     // calculate the actual trafo
     private String calcPowerTrafo(String tabItem, String ipAdress, String trafoNumber) throws SQLException{
         DbConnect conn = new DbConnect();
+        String[]itemValues = new String[26];
         conn.connect(0); 
 
-        //the main html page is containing several placeholders, which are going to be replaced by this function 
-        String mainHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
+        //the main html page is containing placeholders, which are going to be replaced by this function 
+        String exportHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
 
         //iniatilize the key variables
         String placeHoldersAll = getPlaceholders(tabItem);
@@ -92,9 +96,98 @@ public class PowerTrafo  {
         Float coreArea = (float) Math.sqrt(primaryVA) * 1.15f;
         Float turnsPerVolt = primFreq/coreArea;  
         Float primWireSize = getWireSize(primaryVA, primVoltage);
+        Float primaryTurns = turnsPerVolt * primVoltage;
+        Float secundaryTurns = turnsPerVolt * secVoltage;
+        Float fiftyVoltTapTurns = turnsPerVolt * 50;
+        Float secCenterTapTurns = secundaryTurns / 2;
+        Float secWireSize = getWireSize(secMilliAmps, true);
+        Float filFiveTurns = turnsPerVolt * filamentFiveVolts;
+        Float filFiveCtTurns = filFiveTurns / 2;
+        Float filSixTurns = turnsPerVolt * filamentSixVolts;
+        Float filSixCtTurns = filSixTurns / 2;
+        Float filTwelveTurns = turnsPerVolt * filamentTwelveVolts;
+        Float filTwelveCtTurns = filTwelveTurns / 2;
+        Float filFiveWireSize = getWireSize(filFiveAmps, false);
+        Float filSixWireSize = getWireSize(filSixAmps, false);
+        Float filTwelveWireSize = getWireSize(filTwelveAmps, false);
+        Float primTurnArea = calcTurnArea(primWireSize, primaryTurns);
+        Float secTurnArea = calcTurnArea(secWireSize, secundaryTurns);
+        Float fiveVoltTurnArea = calcTurnArea(filFiveWireSize, filFiveTurns);
+        Float sixVoltTurnArea = calcTurnArea(filSixWireSize, filSixTurns);
+        Float twelveVoltTurnArea = calcTurnArea(filTwelveWireSize, filTwelveTurns);
 
+        //vervang de placeholders door de berekende waarden
+        itemValues[0]  = String.format("%.0f", primaryVA).trim();
+        itemValues[1]  = String.format("%.2f", primaryAmps).trim();
+        itemValues[2]  = String.format("%.2f", coreArea).trim();
+        itemValues[3]  = String.format("%.2f", turnsPerVolt).trim();
+        itemValues[4]  = String.format("%.2f", primWireSize).trim();
+        itemValues[5]  = String.format("%.0f", primaryTurns).trim();
+        itemValues[6]  = String.format("%.0f", secundaryTurns).trim();
+        itemValues[7]  = String.format("%.0f", fiftyVoltTapTurns).trim();
+        itemValues[8]  = String.format("%.0f", secCenterTapTurns).trim();
+        itemValues[9]  = String.format("%.2f", secWireSize).trim();
+        itemValues[10] = String.format("%.0f", filFiveTurns).trim();
+        itemValues[11] = String.format("%.0f", filFiveCtTurns).trim();
+        itemValues[12] = String.format("%.2f", filFiveWireSize).trim();
+        itemValues[13] = String.format("%.0f", filSixTurns).trim();
+        itemValues[14] = String.format("%.0f", filSixCtTurns).trim();
+        itemValues[15] = String.format("%.2f", filSixWireSize).trim();
+        itemValues[16] = String.format("%.0f", filTwelveTurns).trim();
+        itemValues[17] = String.format("%.0f", filTwelveCtTurns).trim();
+        itemValues[18] = String.format("%.2f", filTwelveWireSize).trim();
+        itemValues[19] = String.format("%.2f", primTurnArea).trim();
+        itemValues[20] = String.format("%.2f", secTurnArea).trim();
+        itemValues[21] = String.format("%.2f", fiveVoltTurnArea).trim();
+        itemValues[22] = String.format("%.2f", sixVoltTurnArea).trim();
+        itemValues[23] = String.format("%.2f", twelveVoltTurnArea).trim();
+        itemValues[24] = String.format("%.2f", primTurnArea + secTurnArea + fiveVoltTurnArea + sixVoltTurnArea + twelveVoltTurnArea).trim();
+        itemValues[25] = getSuitableEiType(primTurnArea + secTurnArea + fiveVoltTurnArea + sixVoltTurnArea + twelveVoltTurnArea);
+        itemValues[26] = trafoNumber;
 
-        return primWireSize.toString();
+        for (int t = 0; t < placeHolders.length; t++){
+          exportHtml.replace(placeHolders[t], itemValues[t]);
+        }
+
+        if (tapFiftyVolt == 0) {
+          exportHtml = exportHtml.replace(rowHideBools[0],"hidden");
+          itemValues[7] =  "0";
+         } else {exportHtml.replace(rowHideBools[0], "");}
+
+        if (secCenterTap == 0) {
+          exportHtml = exportHtml.replace(rowHideBools[1],"hidden");
+          itemValues[8] =  "0";
+         } else {exportHtml.replace(rowHideBools[1], "");}
+
+        if (filCenterTap == 0) {
+          exportHtml = exportHtml.replace(rowHideBools[2],"hidden");
+          itemValues[11] =  "0";
+          itemValues[14] =  "0";
+          itemValues[17] =  "0";
+         } else {exportHtml.replace(rowHideBools[2], "");}
+
+        if (filFiveWireSize == 0) {
+          exportHtml = exportHtml.replace(rowHideBools[3],"hidden");
+          itemValues[10] =  "0";
+          itemValues[11] =  "0";
+          itemValues[12] =  "0.00";
+         } else {exportHtml.replace(rowHideBools[3], "");}
+
+        if (filSixWireSize == 0) {
+          exportHtml = exportHtml.replace(rowHideBools[4],"hidden");
+          itemValues[13] =  "0";
+          itemValues[14] =  "0";
+          itemValues[15] =  "0.00";
+         } else {exportHtml.replace(rowHideBools[4], "");}
+
+        if (filTwelveWireSize == 0) {
+          exportHtml = exportHtml.replace(rowHideBools[5],"hidden");
+          itemValues[16] =  "0";
+          itemValues[17] =  "0";
+          itemValues[18] =  "0.00";
+         } else {exportHtml.replace(rowHideBools[5], "");}
+
+         return primWireSize.toString();
     }
 
     private String getNextNumber(String tabItem) throws SQLException {
@@ -144,7 +237,7 @@ public class PowerTrafo  {
         return primVa;
     }
 
-    private float getWireSize(Float power, Float voltage) throws SQLException{
+    private float getWireSize(Float power, Float voltage) throws SQLException {
         DbConnect myConn = new DbConnect();
         myConn.connect(1);
         Float current = power /voltage; 
@@ -153,55 +246,33 @@ public class PowerTrafo  {
         return Float.parseFloat(result);
     };
 
-    /*
-      function getWireSize(primVa, primVoltage: single): single; overload;
-  var
-    thisQuery: tAdoQuery;
-    current: single;
-  begin
-    thisQuery := tAdoQuery.Create(nil);
-    current := primVA / primVoltage;
-    result := 0;
+    private float getWireSize(Float secAmps, Boolean isMilliAmps) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        Float current = 0f;
+        myConn.connect(1);
 
-    with thisQuery do begin
-      connection := form1.adoConnHtmlPages;
-      SQL.add('select min(diameter) from tb230_draad_metrisch where MaxAmp >= :amperage');
-      Parameters.ParamByName('amperage').Value := current;
-      try
-        Open;
-        Result := fields[0].AsFloat;
-      except
-        on E:exception do writelog(E.Message);
-      end;
-    end;
-  end;
+        if (isMilliAmps) {
+          current = secAmps / 1000;
+        } else {
+          current = secAmps;
+        }
 
-  function getWireSize(secAmps: single; isMilliAmps: boolean): single; overload;
-  var
-    thisQuery: tAdoQuery;
-    current: single;
-  begin
-    thisQuery := tAdoQuery.Create(nil);
-    result := 0;
+        String result = myConn.fetchSql("select min(diameter) as wireSize from voorthuishtmlpages.tb230_draad_metrisch where MaxAmp >= ?", current.toString(), "wireSize");
+        return Float.parseFloat(result);
+    };
 
-    if isMilliAmps then
-      current := secAmps / 1000
-    else
-      current := secAmps;
+    private Float calcTurnArea(Float diam , Float turns){
+      float Fv = 0.25f ;
+      return ((turns * (float)Math.pow(diam, 2 )) / Fv) / 100f;
+    }
 
-    with thisQuery do begin
-      connection := form1.adoConnHtmlPages;
-      SQL.add('select min(diameter) from tb230_draad_metrisch where MaxAmp >= :amperage');
-      Parameters.ParamByName('amperage').Value := current;
-      try
-        Open;
-        Result := fields[0].AsFloat;
-      except
-        on E:exception do writelog(E.Message);
-      end;
-    end;
-  end;
-
-    */
-    
+    private String getSuitableEiType(Float calculatedWindowsArea) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        myConn.connect(1);
+        try{
+           return myConn.fetchSql("select min(OppervlakVensters), TypeAanduiding from voorthuishtmlpages.tb250_trafoblik where OppervlakVensters >= ?", calculatedWindowsArea.toString(), "TypeAanduiding");
+        } catch(Exception e){
+           throw new RuntimeException("no suitable sheets found for these values");
+        }
+    }
 }
