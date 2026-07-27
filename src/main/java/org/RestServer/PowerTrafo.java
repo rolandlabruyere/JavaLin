@@ -70,7 +70,7 @@ public class PowerTrafo  {
         String[]itemValues = new String[27];
         conn.connect(0); 
 
-        //the main html page is containing placeholders, which are going to be replaced by this function 
+        //the main html page is containing a set of placeholders, which is going to be replaced by this function 
         String exportHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
 
         //iniatilize the key variables
@@ -78,8 +78,8 @@ public class PowerTrafo  {
         String rowHideBoolsAll   = getPlaceholders(tabItem + "_bools");
         String[] placeHolders = placeHoldersAll.split(";");
         String[] rowHideBools = rowHideBoolsAll.split(";");
-        String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.vw205_power_trafo_all where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
 
+        String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.vw205_power_trafo_all where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
         Float secVoltage    = Float.parseFloat(trafoValues[3]);
         Float secMilliAmps  = Float.parseFloat(trafoValues[4]);
         int   secCenterTap  = Integer.parseInt(trafoValues[5]);
@@ -152,42 +152,45 @@ public class PowerTrafo  {
         if (tapFiftyVolt == 0) {
           exportHtml = exportHtml.replace(rowHideBools[0],"hidden");
           itemValues[7] =  "0";
-         } else {exportHtml.replace(rowHideBools[0], "");}
+         } else {exportHtml = exportHtml.replace(rowHideBools[0], "");}
 
         if (secCenterTap == 0) {
           exportHtml = exportHtml.replace(rowHideBools[1],"hidden");
           itemValues[8] =  "0";
-         } else {exportHtml.replace(rowHideBools[1], "");}
+         } else {exportHtml = exportHtml.replace(rowHideBools[1], "");}
 
         if (filCenterTap == 0) {
           exportHtml = exportHtml.replace(rowHideBools[2],"hidden");
           itemValues[11] =  "0";
           itemValues[14] =  "0";
           itemValues[17] =  "0";
-         } else {exportHtml.replace(rowHideBools[2], "");}
+         } else {exportHtml = exportHtml.replace(rowHideBools[2], "");}
 
         if (filFiveWireSize == 0) {
           exportHtml = exportHtml.replace(rowHideBools[3],"hidden");
           itemValues[10] =  "0";
           itemValues[11] =  "0";
           itemValues[12] =  "0.00";
-         } else {exportHtml.replace(rowHideBools[3], "");}
+         } else {exportHtml = exportHtml.replace(rowHideBools[3], "");}
 
         if (filSixWireSize == 0) {
           exportHtml = exportHtml.replace(rowHideBools[4],"hidden");
           itemValues[13] =  "0";
           itemValues[14] =  "0";
           itemValues[15] =  "0.00";
-         } else {exportHtml.replace(rowHideBools[4], "");}
+         } else {exportHtml = exportHtml.replace(rowHideBools[4], "");}
 
         if (filTwelveWireSize == 0) {
           exportHtml = exportHtml.replace(rowHideBools[5],"hidden");
           itemValues[16] =  "0";
           itemValues[17] =  "0";
           itemValues[18] =  "0.00";
-         } else {exportHtml.replace(rowHideBools[5], "");}
+         } else {exportHtml = exportHtml.replace(rowHideBools[5], "");}
 
+        // For replacement of the placeholders, itemValues[26] should be the trafonumber. 
+        // However for the insert query itemValues[26] is the timestamp, so here I replace this value 
         itemValues[26] = fps.depositTimestamp(0);
+
          if (saveCalculatedTrafoSpecs(ipAdress, trafoNumber, itemValues)) {
             return exportHtml;
         } else {
