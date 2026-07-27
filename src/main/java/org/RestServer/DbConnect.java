@@ -18,6 +18,7 @@ public class DbConnect {
         String[] values = valueString.split(";");
 
         if (values.length != count){
+            System.out.println("The number of query parameters doesn't match the number of passed values. Count = " + count + ". Array length = " + values.length);
             throw new RuntimeException("The number of query parameters doesn't match the number of passed values.");
         }
 

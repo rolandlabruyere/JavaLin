@@ -67,7 +67,7 @@ public class PowerTrafo  {
     // calculate the actual trafo
     private String calcPowerTrafo(String tabItem, String ipAdress, String trafoNumber) throws SQLException{
         DbConnect conn = new DbConnect();
-        String[]itemValues = new String[26];
+        String[]itemValues = new String[27];
         conn.connect(0); 
 
         //the main html page is containing placeholders, which are going to be replaced by this function 
@@ -76,8 +76,8 @@ public class PowerTrafo  {
         //iniatilize the key variables
         String placeHoldersAll = getPlaceholders(tabItem);
         String rowHideBoolsAll   = getPlaceholders(tabItem + "_bools");
-        String[] placeHolders = placeHoldersAll.split("|");
-        String[] rowHideBools = rowHideBoolsAll.split("|");
+        String[] placeHolders = placeHoldersAll.split(";");
+        String[] rowHideBools = rowHideBoolsAll.split(";");
         String[] trafoValues = conn.fetchSql("select * from voorthuiscustomersales.vw205_power_trafo_all where ip = ? and trafoNum = ?", ipAdress + ";" + trafoNumber); 
 
         Float secVoltage    = Float.parseFloat(trafoValues[3]);
@@ -146,7 +146,7 @@ public class PowerTrafo  {
         itemValues[26] = trafoNumber;
 
         for (int t = 0; t < placeHolders.length; t++){
-          exportHtml.replace(placeHolders[t], itemValues[t]);
+          exportHtml = exportHtml.replace(placeHolders[t], itemValues[t]);
         }
 
         if (tapFiftyVolt == 0) {
@@ -187,6 +187,7 @@ public class PowerTrafo  {
           itemValues[18] =  "0.00";
          } else {exportHtml.replace(rowHideBools[5], "");}
 
+        itemValues[26] = fps.depositTimestamp(0);
          if (saveCalculatedTrafoSpecs(ipAdress, trafoNumber, itemValues)) {
             return exportHtml;
         } else {
@@ -286,14 +287,14 @@ public class PowerTrafo  {
         DbConnect myConn = new DbConnect();
         myConn.connect(0);
 
-        myConn.execSql("delete from tb210_power_trafo_calcspecs where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+        myConn.execSql("delete from voorthuiscustomersales.tb210_power_trafo_calcspecs where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
 
         for (String value: allValues){
             valueString += value + ";"; 
         }
-        valueString += fps.depositTimestamp(0);
+
         try{
-            myConn.execSql("insert into tb210_power_trafo_calcspecs values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", valueString);
+            myConn.execSql("insert into voorthuiscustomersales.tb210_power_trafo_calcspecs values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", valueString);
             result = true;
         } catch(Exception e){result = false;}
         
