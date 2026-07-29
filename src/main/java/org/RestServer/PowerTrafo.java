@@ -1,6 +1,7 @@
 package org.restserver;
 import java.sql.SQLException;
 import static org.restserver.FuncsAndProcs.decodeBase64;
+import static org.restserver.FuncsAndProcs.encodeBase64;
 
 public class PowerTrafo  {
     FuncsAndProcs fps = new FuncsAndProcs();
@@ -192,6 +193,7 @@ public class PowerTrafo  {
         itemValues[26] = fps.depositTimestamp(0);
 
          if (saveCalculatedTrafoSpecs(ipAdress, trafoNumber, itemValues)) {
+            saveHtmlDoc(ipAdress, trafoNumber, exportHtml);
             return exportHtml;
         } else {
             return "failed to save power trafo";
@@ -304,4 +306,12 @@ public class PowerTrafo  {
         return result;
     }
 
+    private void saveHtmlDoc(String ipAddress, String trafoNumber, String htmlCode) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        myConn.connect(0);
+        String decodedHtml = encodeBase64(htmlCode);
+
+        myConn.execSql("delete from voorthuiscustomersales.tb940_save_html_doc where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
+        myConn.execSql("insert into voorthuiscustomersales.tb210_power_trafo_calcspecs values (?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + decodedHtml);
+    }
 }

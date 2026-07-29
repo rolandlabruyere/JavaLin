@@ -2,6 +2,7 @@ package org.restserver;
 
 import org.ini4j.Ini;
 import org.ini4j.Profile.Section;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,11 +14,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+//import static java.lang.Math.abs;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.Base64;
-//import static java.lang.Math.abs;
 
 public class FuncsAndProcs {
 
@@ -41,12 +41,21 @@ public class FuncsAndProcs {
         byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
         return new String(decodedBytes);
     }
+    public static String encodeBase64(String decodedString){
+        byte[] decodedBytes = decodedString.getBytes();
+        byte[] encodedBytes = Base64.getEncoder().encode(decodedBytes);
+        return new String(encodedBytes);
+    }
 
 
-    public String getLogPath() throws Throwable{
-        File iniFile = new File(iniPath);
-        Ini ini = new Ini(iniFile);
-        return ini.get("CommonSettings", "TempLog");
+    public String getLogPath() {
+        try{
+            File iniFile = new File(iniPath);
+            Ini ini = new Ini(iniFile);
+            return ini.get("CommonSettings", "TempLog");
+        } catch(Exception e){
+            return e.getMessage();
+        }
     }
     public String getIniValue(String section, String iniKey) throws Throwable{
         File iniFile = new File(iniPath);
@@ -166,14 +175,17 @@ public class FuncsAndProcs {
         }
         return rndNum.toString();
     }
-    public void writeToFile(String logPath, String namePart1, String namePart2, String namePart3, String textToWrite) throws Throwable{
-        String fileName = namePart1 + "_" + namePart2 + "_" + namePart3 + ".json";
+    public void writeToFile(String namePart, String extension, String textToWrite){
+        String fileName = namePart + "." + extension;
+        try{
+            OutputStream outputFile = new FileOutputStream(getLogPath() + fileName);
+            byte[] bytes = textToWrite.getBytes();
+            outputFile.write(bytes);
 
-        OutputStream outputFile = new FileOutputStream(logPath + fileName);
-        byte[] bytes = textToWrite.getBytes();
-        outputFile.write(bytes);
-        writeToLog("[" + fileName + "]\n");
-        outputFile.close();
+            outputFile.close();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
     public void deleteFile(String filename) throws IOException {
         Path fileToDeletePath = Paths.get(filename);
