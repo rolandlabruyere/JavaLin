@@ -189,11 +189,12 @@ public class PowerTrafo  {
          } else {exportHtml = exportHtml.replace(rowHideBools[5], "");}
 
         // For replacement of the placeholders, itemValues[26] should be the trafonumber. 
-        // However for the insert query itemValues[26] is the timestamp, so here I replace this value 
+        // However for the insert query itemValues[26] is the timestamp, so here I replace them 
         itemValues[26] = fps.depositTimestamp(0);
 
          if (saveCalculatedTrafoSpecs(ipAdress, trafoNumber, itemValues)) {
-            saveHtmlDoc(ipAdress, trafoNumber, exportHtml);
+            saveHtmlDoc(ipAdress, trafoNumber, exportHtml.replace("$hideButton$", "hidden"));
+         //   saveHtmlDoc(ipAdress, trafoNumber, exportHtml);
             return exportHtml;
         } else {
             return "failed to save power trafo";
@@ -210,8 +211,7 @@ public class PowerTrafo  {
         String trafoNumber = myConn.fetchSql("select * from voorthuishtmlpages.tb900_numberstabel where itemtype = ?", tabItem, "itemNumber");
         String formattedTrafoNumber =  mYear + mMonth + fps.formatNumber(Integer.parseInt(trafoNumber));
 
-        myConn.execSql("delete from voorthuishtmlpages.tb900_numberstabel where itemType = ?", tabItem);
-        myConn.execSql("insert into voorthuishtmlpages.tb900_numberstabel values (?, ?, ?, ?)", tabItem + ";" + mYear + ";" + mMonth + ";" + (Integer.parseInt(trafoNumber) + 1));
+        myConn.execSql("replace into voorthuishtmlpages.tb900_numberstabel values (?, ?, ?, ?)", tabItem + ";" + mYear + ";" + mMonth + ";" + (Integer.parseInt(trafoNumber) + 1));
 
         return formattedTrafoNumber;
     }
@@ -292,14 +292,12 @@ public class PowerTrafo  {
         DbConnect myConn = new DbConnect();
         myConn.connect(0);
 
-        myConn.execSql("delete from voorthuiscustomersales.tb210_power_trafo_calcspecs where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
-
         for (String value: allValues){
             valueString += value + ";"; 
         }
 
         try{
-            myConn.execSql("insert into voorthuiscustomersales.tb210_power_trafo_calcspecs values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", valueString);
+            myConn.execSql("replace into voorthuiscustomersales.tb210_power_trafo_calcspecs values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", valueString);
             result = true;
         } catch(Exception e){result = false;}
         
@@ -311,7 +309,6 @@ public class PowerTrafo  {
         myConn.connect(0);
         String decodedHtml = encodeBase64(htmlCode);
 
-        myConn.execSql("delete from voorthuiscustomersales.tb940_save_html_doc where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber);
-        myConn.execSql("insert into voorthuiscustomersales.tb210_power_trafo_calcspecs values (?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + decodedHtml);
+        myConn.execSql("replace into voorthuiscustomersales.tb940_save_html_doc values (?, ?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + decodedHtml + ";" + fps.depositTimestamp(0));
     }
 }
