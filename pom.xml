@@ -39,12 +39,6 @@
 			<version>8.0.19</version>
 		</dependency>
 		<dependency>
-			<groupId>org.ini4j</groupId>
-			<artifactId>ini4j</artifactId>
-			<version>0.5.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-artifact-manager</artifactId>
 			<version>2.2.1</version>
@@ -56,15 +50,37 @@
 			<version>3.12.0</version>
 		</dependency>
 		<dependency>
+			<groupId>io.nayuki</groupId>
+			<artifactId>qrcodegen</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.22.2</version>
+			<scope>compile</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.xhtmlrenderer</groupId>
+			<artifactId>flying-saucer-pdf</artifactId>
+			<version>10.3.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.openhtmltopdf</groupId>
+			<artifactId>openhtmltopdf-core</artifactId>
+			<version>1.0.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.openhtmltopdf</groupId>
+			<artifactId>openhtmltopdf-pdfbox</artifactId>
+			<version>1.0.10</version>
+		</dependency>
+		<dependency>
 			<groupId>org.ini4j</groupId>
 			<artifactId>ini4j</artifactId>
 			<version>0.5.4</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.nayuki</groupId>
-			<artifactId>qrcodegen</artifactId>
-			<version>1.4.0</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -137,9 +137,6 @@ sup {
 }
 .infoContainer {
     background-color: rgb(150 200 200 / 0);  
-	float: right;
-	position: absolute;
-	left: -195px;
 	margin-left: 0px;
 	margin-right: 0px;
 	height: 720px;
@@ -148,6 +145,11 @@ sup {
 	justify-content: space-evenly;
 	padding: 30px;
 	gap: 15px;
+}
+.vertMenu {
+    background-color: rgb(150 200 200 / 0);  
+	position: absolute;
+	left: 0px;
 }
 
 .imgSplash {

@@ -16,6 +16,7 @@ public class RestServer {
             
             //map get routes
             config.routes.get("/"                           , ctx -> ctx.html(getRoot("indexPage")));
+            config.routes.get("/clear"                      , ctx -> ctx.html(""));
             config.routes.get("/voedingstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/smoorspoel"                 , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/uitgangstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
@@ -27,6 +28,8 @@ public class RestServer {
             config.routes.get("/instellingen"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/powerTrafoLayout/{value}"   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", "").replace(ctx.pathParam("value"), ""), ctx.pathParam("value"))));
+            config.routes.get("/prepareSales"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            
             //map post routes
             config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("values"))));
         }).start(7070);
@@ -52,6 +55,7 @@ public class RestServer {
             case "about"                -> resultHtml = getRoot(tabItem);
             case "instellingen"         -> resultHtml = getRoot(tabItem);
             case "home"                 -> resultHtml = getRoot(tabItem);
+            case "prepareSales"          -> resultHtml = getRoot(tabItem);
             case "powerTrafoLayout"     -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
             case "powertrafo"           -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
        }

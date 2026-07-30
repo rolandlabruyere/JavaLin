@@ -121,6 +121,8 @@ const Menu = ({ items }) => {
       onMouseEnter: () => {setActive(menuIndex);},
       onClick: () => {
 			htmx.ajax("GET", "/" + item.name, "#contentDiv");
+            htmx.ajax("GET", "/clear", "#vertMenuDiv");
+            htmx.ajax("GET", "/clear", "#infoDiv");
 			objectBin = 1;
 			savedValues = "";
 		 },

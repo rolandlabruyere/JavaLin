@@ -1,6 +1,5 @@
 package org.restserver;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ConstructHtmlPages {
@@ -10,14 +9,9 @@ public class ConstructHtmlPages {
     public String getHtmlPage(String tabItem) throws SQLException {
         //String[] placeholders;
         myConn.connect(1); 
-        ResultSet rs = myConn.openSql("select * from tb100_htmlpaginas where id = ?", tabItem);
-
-        rs.next();
-        String htmlPage = rs.getString("InlineHtml");
-
-        //htmlPage = setActivePage(htmlPage, tabItem);
-        //fps.writeToLog(htmlPage);
+        String htmlPage = myConn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", tabItem, "InlineHtml");
         myConn.close();
+
         return htmlPage;
     }
     public String constructTrafoLayoutPage(String tabItem, Integer layOutValue) throws SQLException {

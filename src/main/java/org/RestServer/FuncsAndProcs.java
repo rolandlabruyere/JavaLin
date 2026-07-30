@@ -178,7 +178,7 @@ public class FuncsAndProcs {
     public void writeToFile(String namePart, String extension, String textToWrite){
         String fileName = namePart + "." + extension;
         try{
-            OutputStream outputFile = new FileOutputStream(getLogPath() + fileName);
+            OutputStream outputFile = new FileOutputStream(fileName);
             byte[] bytes = textToWrite.getBytes();
             outputFile.write(bytes);
 
