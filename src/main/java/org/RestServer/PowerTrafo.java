@@ -1,7 +1,7 @@
 package org.restserver;
 import java.sql.SQLException;
 
-import org.restserver.HtmlRenderer.PdfGenerator;
+//import org.restserver.HtmlRenderer.PdfGenerator;
 
 import static org.restserver.FuncsAndProcs.decodeBase64;
 import static org.restserver.FuncsAndProcs.encodeBase64;
@@ -310,21 +310,36 @@ public class PowerTrafo  {
         DbConnect myConn = new DbConnect();
         myConn.connect(0);
         String sourcePath = "src/main/resources/public/html/";
-        String destPath = "src/main/resources/public/downloads/";
-        htmlCode = htmlCode.replace("$hideButton$", "hidden");
-        String newHtml = myConn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "bodyContent" , "InlineHtml" );
-        newHtml = newHtml.replace("$bodyContent$", htmlCode);
 
-        fps.writeToFile(sourcePath + trafoNumber, "html", newHtml);
+        htmlCode = htmlCode.replace("$hideButton$", "hidden");
+        htmlCode = parseHtmlBeforePdf(htmlCode);
+
         
-        String decodedHtml = encodeBase64(newHtml);
+        fps.writeToFile(sourcePath + trafoNumber, "html", htmlCode);
+        
+        String decodedHtml = encodeBase64(htmlCode);
         myConn.execSql("replace into voorthuiscustomersales.tb940_save_html_doc values (?, ?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + decodedHtml + ";" + fps.depositTimestamp(0));
 
         // PdfGenerator pg = new PdfGenerator();
         // try{
-        //     pg.createPdf(sourcePath + trafoNumber + ".html", destPath  + trafoNumber + ".pdf");
+        //     pg.createPdf(trafoNumber + ".html", trafoNumber + ".pdf");
+        //     fps.deleteFile(sourcePath + trafoNumber + ".html");
         // }catch(Exception e){
         //     System.out.println(e.getMessage());
         // }
+    }
+
+    private String parseHtmlBeforePdf(String htmlCode){
+        String[] htmlLines = htmlCode.split("\n");
+        String parsedHtml = "";
+
+        for(int t = 0; t < htmlLines.length; t++){
+            if (htmlLines[t].contains("hidden")) {
+                while (! htmlLines[t].contains("</tr>")) t++; //alleen teller verhogen; de regels na "hidden" mogen genegeerd worden tot aan einde tabel rij. 
+            } else {
+                parsedHtml += htmlLines[t];
+            };
+        }
+        return parsedHtml; 
     }
 }
