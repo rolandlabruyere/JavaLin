@@ -1,8 +1,6 @@
 package org.restserver;
 import java.sql.SQLException;
-
-//import org.restserver.HtmlRenderer.PdfGenerator;
-
+import org.restserver.HtmlRenderer.PdfGenerator;
 import static org.restserver.FuncsAndProcs.decodeBase64;
 import static org.restserver.FuncsAndProcs.encodeBase64;
 
@@ -313,8 +311,7 @@ public class PowerTrafo  {
 
         htmlCode = htmlCode.replace("$hideButton$", "hidden");
         htmlCode = parseHtmlBeforePdf(htmlCode);
-
-        
+      
         fps.writeToFile(sourcePath + trafoNumber, "html", htmlCode);
         
         String decodedHtml = encodeBase64(htmlCode);

@@ -55,7 +55,7 @@ public class RestServer {
             case "about"                -> resultHtml = getRoot(tabItem);
             case "instellingen"         -> resultHtml = getRoot(tabItem);
             case "home"                 -> resultHtml = getRoot(tabItem);
-            case "prepareSales"          -> resultHtml = getRoot(tabItem);
+            case "prepareSales"         -> resultHtml = getRoot(tabItem);
             case "powerTrafoLayout"     -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
             case "powertrafo"           -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
        }

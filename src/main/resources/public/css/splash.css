@@ -216,10 +216,11 @@ button{
 } 
 
 .menuCells {
-  border:5px solid rgb(200, 200, 200);
-  background: rgb(200, 200, 200);
+  border:5px solid rgb(29, 109, 116);
+  background: rgb(29, 109, 116);
   padding: 5px;
   cursor: pointer;
+  color: white;
 }
 .dwnldButton {
 	padding: 10px 10px; 
