@@ -5,12 +5,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.*;
 
 public class DbConnect {
-    static String[] connectionUrl = {"jdbc:mysql://localhost:3306/voorthuiscustomersales", "jdbc:mysql://localhost:3306/voorthuishtmlpages"};
+    static String connectionUrl = "jdbc:mysql://localhost:3306/voorthuiscustomersales";
     static Connection conn;
     FuncsAndProcs fps = new FuncsAndProcs();
 
-    public void connect(int index) throws SQLException {
-       conn = DriverManager.getConnection(connectionUrl[index], "root", "w2YNcM01||P3n1sl@nD01");
+    public void connect() throws SQLException {
+       conn = DriverManager.getConnection(connectionUrl, "root", "w2YNcM01||P3n1sl@nD01");
     }
 
     public void execSql(String icudQuery, String valueString) throws SQLException {

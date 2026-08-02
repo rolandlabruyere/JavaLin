@@ -3,20 +3,19 @@ package org.restserver;
 import java.sql.SQLException;
 
 public class ConstructHtmlPages {
-    DbConnect myConn = new DbConnect();
     FuncsAndProcs fps = new FuncsAndProcs();
 
     public String getHtmlPage(String tabItem) throws SQLException {
-        //String[] placeholders;
-        myConn.connect(1); 
+        DbConnect myConn = new DbConnect();
+        myConn.connect(); 
         String htmlPage = myConn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", tabItem, "InlineHtml");
-        myConn.close();
 
         return htmlPage;
     }
     public String constructTrafoLayoutPage(String tabItem, Integer layOutValue) throws SQLException {
-        myConn.connect(1); 
-        String htmlString = myConn.fetchSql("select * from tb120_html_snippets where id = ? and itemNr = 0", tabItem, "HtmlCode");
+        DbConnect myConn = new DbConnect();
+        myConn.connect(); 
+        String htmlString = myConn.fetchSql("select * from voorthuishtmlpages.tb120_html_snippets where id = ? and itemNr = 0", tabItem, "HtmlCode");
 
         for (Integer i = 0; i < 7; i++) {
             Integer bitValue = (int)Math.pow(2, i);
@@ -27,12 +26,13 @@ public class ConstructHtmlPages {
             }
         }
 
-        myConn.close();
         return htmlString;
     }
 
     private String getSnippet(String tabItem, Integer itemNr) throws SQLException {
-        return myConn.fetchSql("select * from tb120_html_snippets where id = ? and itemNr = ?", tabItem + ";" + itemNr.toString(), "HtmlCode");
+        DbConnect myConn = new DbConnect();
+        myConn.connect(); 
+        return myConn.fetchSql("select * from voorthuishtmlpages.tb120_html_snippets where id = ? and itemNr = ?", tabItem + ";" + itemNr.toString(), "HtmlCode");
     }
 
 }

@@ -1,6 +1,6 @@
 package org.restserver;
 import java.sql.SQLException;
-import org.restserver.HtmlRenderer.PdfGenerator;
+//import org.restserver.HtmlRenderer.PdfGenerator;
 import static org.restserver.FuncsAndProcs.decodeBase64;
 import static org.restserver.FuncsAndProcs.encodeBase64;
 
@@ -18,14 +18,14 @@ public class PowerTrafo  {
     
     public String powerTrafoLayout(String tabItem, String ipAddress, Integer value) throws SQLException {
         DbConnect myConn = new DbConnect();
-        myConn.connect(0); 
+        myConn.connect(); 
         myConn.execSql("insert into voorthuiscustomersales.tb910_temp_trafo_settings values (?, ?, ?, ?, ?)", ipAddress + ";1;" + tabItem + ";" + value.toString() + ";" + fps.depositTimestamp(0));
         return chp.constructTrafoLayoutPage(tabItem, value);
     }
 
     public String postPowerTrafoSpecs(String tabItem, String ipAddress, String valueString) throws SQLException {
         DbConnect conn = new DbConnect();
-        conn.connect(0); 
+        conn.connect(); 
         String decodedValues = decodeBase64(valueString);
         String[] values = decodedValues.split("&");
         String trafoNumber = getNextNumber(tabItem);
@@ -70,7 +70,7 @@ public class PowerTrafo  {
     private String calcPowerTrafo(String tabItem, String ipAdress, String trafoNumber) throws SQLException{
         DbConnect conn = new DbConnect();
         String[]itemValues = new String[27];
-        conn.connect(0); 
+        conn.connect(); 
 
         //the main html page is containing a set of placeholders, which is going to be replaced by this function 
         String exportHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
@@ -203,7 +203,7 @@ public class PowerTrafo  {
 
     private String getNextNumber(String tabItem) throws SQLException {
         DbConnect myConn = new DbConnect();
-        myConn.connect(1); 
+        myConn.connect(); 
         String dateString = fps.depositTimestamp(0);
         String mYear = dateString.substring(0, 4);
         String mMonth = dateString.substring(5, 7);
@@ -218,13 +218,13 @@ public class PowerTrafo  {
 
     private String getPlaceholders(String searchItem) throws SQLException {
         DbConnect myConn = new DbConnect();
-        myConn.connect(1); 
+        myConn.connect(); 
         return myConn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", searchItem, "placeHolderString");
     }
 
     private void checkGridEntry(String myIp) throws SQLException{
         DbConnect myConn = new DbConnect();
-        myConn.connect(0);
+        myConn.connect();
 
         try{ 
             myConn.fetchSql("select * from voorthuiscustomersales.tb930_grid_settings_per_ip where Ip = ?", myIp);
@@ -235,7 +235,7 @@ public class PowerTrafo  {
 
     private Float getSumVASecundary(String myIp, String trafoNum) throws SQLException{
         DbConnect myConn = new DbConnect();
-        myConn.connect(0);
+        myConn.connect();
 
         String[] result = myConn.fetchSql("select * from voorthuiscustomersales.vw205_power_trafo_all where ip = ? and trafoNum = ?", myIp + ";" + trafoNum);
         Float primVa = Float.parseFloat(result[3]) * Float.parseFloat(result[4]) / 1000; 
@@ -249,7 +249,7 @@ public class PowerTrafo  {
 
     private float getWireSize(Float power, Float voltage) throws SQLException {
         DbConnect myConn = new DbConnect();
-        myConn.connect(1);
+        myConn.connect();
         Float current = power /voltage; 
 
         String result = myConn.fetchSql("select min(diameter) as wireSize from voorthuishtmlpages.tb230_draad_metrisch where MaxAmp >= ?", current.toString(), "wireSize");
@@ -259,7 +259,7 @@ public class PowerTrafo  {
     private float getWireSize(Float secAmps, Boolean isMilliAmps) throws SQLException {
         DbConnect myConn = new DbConnect();
         Float current = 0f;
-        myConn.connect(1);
+        myConn.connect();
 
         if (isMilliAmps) {
           current = secAmps / 1000;
@@ -278,7 +278,7 @@ public class PowerTrafo  {
 
     private String getSuitableEiType(Float calculatedWindowsArea) throws SQLException {
         DbConnect myConn = new DbConnect();
-        myConn.connect(1);
+        myConn.connect();
         try{
            return myConn.fetchSql("select min(OppervlakVensters), TypeAanduiding from voorthuishtmlpages.tb250_trafoblik where OppervlakVensters >= ?", calculatedWindowsArea.toString(), "TypeAanduiding");
         } catch(Exception e){
@@ -290,7 +290,7 @@ public class PowerTrafo  {
         boolean result = false;
         String valueString = ipAddress + ";" + trafoNumber + ";";
         DbConnect myConn = new DbConnect();
-        myConn.connect(0);
+        myConn.connect();
 
         for (String value: allValues){
             valueString += value + ";"; 
@@ -306,7 +306,7 @@ public class PowerTrafo  {
 
     private void saveHtmlDoc(String ipAddress, String trafoNumber, String htmlCode) throws SQLException {
         DbConnect myConn = new DbConnect();
-        myConn.connect(0);
+        myConn.connect();
         String sourcePath = "src/main/resources/public/html/";
 
         htmlCode = htmlCode.replace("$hideButton$", "hidden");
