@@ -1,6 +1,5 @@
 package org.restserver;
 import java.sql.SQLException;
-//import org.restserver.HtmlRenderer.PdfGenerator;
 import static org.restserver.FuncsAndProcs.decodeBase64;
 import static org.restserver.FuncsAndProcs.encodeBase64;
 
@@ -11,11 +10,6 @@ public class PowerTrafo  {
     static final Float filamentSixVolts = 6.3f;
     static final Float filamentTwelveVolts = 12.6f;
 
-    /*
-        0 = connect to the customer sales database
-        1 = connect to the html pages database
-    */
-    
     public String powerTrafoLayout(String tabItem, String ipAddress, Integer value) throws SQLException {
         DbConnect myConn = new DbConnect();
         myConn.connect(); 
@@ -61,7 +55,6 @@ public class PowerTrafo  {
         return calcPowerTrafo(tabItem, ipAddress, trafoNumber);
     }
 
-
     /*************************************************************************************************
      *    private functions
      * ***********************************************************************************************/
@@ -76,8 +69,8 @@ public class PowerTrafo  {
         String exportHtml = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "calculatedTrafoSpecs" , "InlineHtml" );
 
         //iniatilize the key variables
-        String placeHoldersAll = getPlaceholders(tabItem);
-        String rowHideBoolsAll   = getPlaceholders(tabItem + "_bools");
+        String placeHoldersAll = chp.getPlaceholders(tabItem);
+        String rowHideBoolsAll = chp.getPlaceholders(tabItem + "_bools");
         String[] placeHolders = placeHoldersAll.split(";");
         String[] rowHideBools = rowHideBoolsAll.split(";");
 
@@ -216,12 +209,6 @@ public class PowerTrafo  {
         return formattedTrafoNumber;
     }
 
-    private String getPlaceholders(String searchItem) throws SQLException {
-        DbConnect myConn = new DbConnect();
-        myConn.connect(); 
-        return myConn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", searchItem, "placeHolderString");
-    }
-
     private void checkGridEntry(String myIp) throws SQLException{
         DbConnect myConn = new DbConnect();
         myConn.connect();
@@ -316,14 +303,6 @@ public class PowerTrafo  {
         
         String decodedHtml = encodeBase64(htmlCode);
         myConn.execSql("replace into voorthuiscustomersales.tb940_save_html_doc values (?, ?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + decodedHtml + ";" + fps.depositTimestamp(0));
-
-        // PdfGenerator pg = new PdfGenerator();
-        // try{
-        //     pg.createPdf(trafoNumber + ".html", trafoNumber + ".pdf");
-        //     fps.deleteFile(sourcePath + trafoNumber + ".html");
-        // }catch(Exception e){
-        //     System.out.println(e.getMessage());
-        // }
     }
 
     private String parseHtmlBeforePdf(String htmlCode){

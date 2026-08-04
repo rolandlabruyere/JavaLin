@@ -12,6 +12,13 @@ public class ConstructHtmlPages {
 
         return htmlPage;
     }
+
+    public String getPlaceholders(String searchItem) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        myConn.connect(); 
+        return myConn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", searchItem, "placeHolderString");
+    }
+
     public String constructTrafoLayoutPage(String tabItem, Integer layOutValue) throws SQLException {
         DbConnect myConn = new DbConnect();
         myConn.connect(); 
@@ -34,5 +41,4 @@ public class ConstructHtmlPages {
         myConn.connect(); 
         return myConn.fetchSql("select * from voorthuishtmlpages.tb120_html_snippets where id = ? and itemNr = ?", tabItem + ";" + itemNr.toString(), "HtmlCode");
     }
-
 }

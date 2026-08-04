@@ -5,6 +5,8 @@ import io.javalin.http.staticfiles.Location;
 import static org.restserver.FuncsAndProcs.decodeBase64;
 import java.sql.SQLException;
 
+import org.restserver.HtmlRenderer.PrintDesignForm;
+
 public class RestServer {
 
     public static void main(String[] args) throws Throwable {
@@ -38,10 +40,11 @@ public class RestServer {
 
     private static String trackSession(String ipAddress, String tabItem, String value) throws SQLException {
         DbConnect conn = new DbConnect();
-        ipAddress = decodeBase64(ipAddress);
         FuncsAndProcs fps = new FuncsAndProcs();
         PowerTrafo pt = new PowerTrafo();
+        PrintDesignForm pdf = new PrintDesignForm();
         String resultHtml = "";
+        ipAddress = decodeBase64(ipAddress);
 
         conn.connect(); 
         conn.execSql("insert into voorthuiscustomersales.tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
