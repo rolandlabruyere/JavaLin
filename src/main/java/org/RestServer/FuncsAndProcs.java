@@ -225,7 +225,7 @@ public class FuncsAndProcs {
 
     public void writeToAnyFile(String fullPath, String textToWrite){
         try {
-            Files.writeString(Path.of(fullPath), textToWrite , StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.writeString(Path.of(fullPath), textToWrite , StandardOpenOption.CREATE);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
