@@ -28,14 +28,15 @@ public class PrintDesignForm {
         }
         
         htmlPage = htmlPage.replace("hidden hidden", "hidden");
+        fps.writeToAnyFile(sourcePath + trafoNumber + ".html", htmlPage);
 
-        h2p.convertHtml2Pdf(trafoNumber, htmlPage);
+        return h2p.generatePdfFromHtml(trafoNumber);
 
-        try{
-            fps.deleteFile(sourcePath + trafoNumber + ".html");
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-        return "do something";
+        // try{
+        //     fps.deleteFile(sourcePath + trafoNumber + ".html");
+        // }catch(Exception e){
+        //     System.out.println(e.getMessage());
+        // }
+        // return "do something";
     }
 }
