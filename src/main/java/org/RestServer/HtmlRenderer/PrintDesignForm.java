@@ -6,10 +6,12 @@ import org.restserver.DbConnect;
 import org.restserver.FuncsAndProcs;
 
 public class PrintDesignForm {
-    FuncsAndProcs fps = new FuncsAndProcs();
-    ConstructHtmlPages chp = new ConstructHtmlPages();
-    String sourcePath = "src/main/resources/public/html/";
-    HtmlToPdfOpenPDF h2p = new HtmlToPdfOpenPDF();
+    FuncsAndProcs       fps = new FuncsAndProcs();
+    ConstructHtmlPages  chp = new ConstructHtmlPages();
+    PdfGenerator        pg = new PdfGenerator();
+
+    String sourcePath   = "src/main/resources/public/html/";
+    String destPath     = "src/main/resources/public/download/";
 
     public String generatePdfDoc(String tabItem, String ipAddress) throws SQLException{
         DbConnect conn = new DbConnect();
@@ -23,20 +25,31 @@ public class PrintDesignForm {
         for (int t = 0; t < placeholders.length; t++ ){
             htmlPage = htmlPage.replace(placeholders[t], dataItems[t + 1]);
         }
-        for (String placeholder: hidePlaceholders ){
-            htmlPage = htmlPage.replace(placeholder, "hidden");
+
+        for (int t = 0; t < dataItems.length; t++ ){
+            switch (t){
+                case 4, 5, 9 ->  {
+                    if(dataItems[t].equalsIgnoreCase( "nee")) {
+                        htmlPage = htmlPage.replace(hidePlaceholders[t - 4], "hidden");
+                    }  else {
+                        htmlPage = htmlPage.replace(hidePlaceholders[t - 4], "");
+                    }
+                }
+                case 6, 7, 8 ->  {
+                    if(dataItems[t].equals( "0.00")) {
+                        htmlPage = htmlPage.replace(hidePlaceholders[t - 4], "hidden");
+                    }  else {
+                        htmlPage = htmlPage.replace(hidePlaceholders[t - 4], "");
+                    }
+                }
+            }
         }
         
         htmlPage = htmlPage.replace("hidden hidden", "hidden");
         fps.writeToAnyFile(sourcePath + trafoNumber + ".html", htmlPage);
 
-        return h2p.generatePdfFromHtml(trafoNumber);
+        return pg.createPdf(trafoNumber);
 
-        // try{
-        //     fps.deleteFile(sourcePath + trafoNumber + ".html");
-        // }catch(Exception e){
-        //     System.out.println(e.getMessage());
-        // }
-        // return "do something";
     }
 }
+

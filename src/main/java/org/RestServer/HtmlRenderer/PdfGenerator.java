@@ -16,16 +16,16 @@ public class PdfGenerator {
     String outputPath = "src/main/resources/public/downloads/";
     FuncsAndProcs fps = new FuncsAndProcs();
 
-    public void createPdf(String src, String dest) {
-        File inputHTML = new File(inputPath + src); 
+    public String createPdf(String filename) {
+        File inputHTML = new File(inputPath + filename + ".html"); 
 
         try {
             Document parsedHtml = parseHtml(inputHTML);   
-             FileOutputStream pdfFile = (FileOutputStream)convertXhtmlToPdf(parsedHtml, outputPath + dest); 
-             pdfFile.write(null);
+            convertXhtmlToPdf(parsedHtml, outputPath + filename + ".pdf"); 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("error: " + e.getMessage());
         }
+        return outputPath + filename + ".pdf";
     }
 
     private Document parseHtml(File htmlFile) throws IOException{
@@ -34,17 +34,16 @@ public class PdfGenerator {
             return document;    
         }
 
-    private OutputStream convertXhtmlToPdf(Document htmlFile, String outputPdf) throws IOException{
+    private void convertXhtmlToPdf(Document htmlFile, String outputPdf) throws IOException{
         try (OutputStream fos = new FileOutputStream(outputPdf)) {
             String baseUrl = FileSystems.getDefault()
-            .getPath("src/main/resources/")
-            .toUri().toURL().toString();
+                .getPath("src/main/resources/public/")
+                .toUri().toURL().toString();
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.withUri(outputPdf);
             builder.withW3cDocument(new W3CDom().fromJsoup(htmlFile), baseUrl);
             builder.toStream(fos);
             builder.run();
-            return fos;  
         }  
     }
 }
