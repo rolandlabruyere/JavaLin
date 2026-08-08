@@ -32,7 +32,6 @@ public class ConstructHtmlPages {
                 htmlString = htmlString.replace("$snippet"+ bitValue +"$", "");
             }
         }
-
         return htmlString;
     }
 

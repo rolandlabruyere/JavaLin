@@ -16,16 +16,21 @@ public class PdfGenerator {
     String outputPath = "src/main/resources/public/downloads/";
     FuncsAndProcs fps = new FuncsAndProcs();
 
-    public String createPdf(String filename) {
-        File inputHTML = new File(inputPath + filename + ".html"); 
+    public String createPdf(String trafoNumber) {
+        File inputHTML = new File(inputPath + trafoNumber + ".html"); 
 
         try {
             Document parsedHtml = parseHtml(inputHTML);   
-            convertXhtmlToPdf(parsedHtml, outputPath + filename + ".pdf"); 
+            convertXhtmlToPdf(parsedHtml, outputPath + trafoNumber + ".pdf"); 
         } catch (Exception e) {
             System.out.println("error: " + e.getMessage());
         }
-        return outputPath + filename + ".pdf";
+
+        try{
+            fps.deleteFile(inputPath + trafoNumber + ".html");
+        } catch(Exception e){e.getMessage();}
+        
+        return outputPath + trafoNumber + ".pdf";
     }
 
     private Document parseHtml(File htmlFile) throws IOException{
@@ -36,6 +41,8 @@ public class PdfGenerator {
 
     private void convertXhtmlToPdf(Document htmlFile, String outputPdf) throws IOException{
         try (OutputStream fos = new FileOutputStream(outputPdf)) {
+
+            //set a base url from where css files can be imported 
             String baseUrl = FileSystems.getDefault()
                 .getPath("src/main/resources/public/")
                 .toUri().toURL().toString();

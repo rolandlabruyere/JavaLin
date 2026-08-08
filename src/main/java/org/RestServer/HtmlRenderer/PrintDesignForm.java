@@ -46,10 +46,27 @@ public class PrintDesignForm {
         }
         
         htmlPage = htmlPage.replace("hidden hidden", "hidden");
+
+        // sadly the PDF creator is ignoring the "hidden" attributes to avoid unnecessary lines.
+        // So, finally parse the HTML and filter the "hidden" lines manually
+        htmlPage = optimizeHtml(htmlPage);
+
         fps.writeToAnyFile(sourcePath + trafoNumber + ".html", htmlPage);
 
         return pg.createPdf(trafoNumber);
-
     }
+
+    public String optimizeHtml(String fullHtml){
+        String result = "";
+        String[] htmlLines = fullHtml.split("\r\n");
+        for(int t = 0; t < htmlLines.length; t++){
+            if (htmlLines[t].contains("hidden")){
+                while (! htmlLines[t].contains("</tr>")) t++;
+            } else{
+                result += htmlLines[t] + "\n";
+            }
+        }
+        return result;
+    } 
 }
 
