@@ -21,6 +21,8 @@ public class PrintDesignForm {
         String[] dataItems = conn.fetchSql("select * from voorthuishtmlpages.vw810_full_csv_layout_turn_schem where ip = ? and orderNum = ?", ipAddress + ";" + trafoNumber); 
         String[] placeholders = chp.getPlaceholders(tabItem).split(";");
         String[] hidePlaceholders = chp.getPlaceholders(tabItem + "_bools").split(";");
+        String downLoadButton = conn.fetchSql("select * from voorthuishtmlpages.tb100_htmlpaginas where id = ?", "wsDownloadButton", "InlineHtml");
+        String dLButtonPlaceHold = conn.fetchSql("select * from voorthuishtmlpages.tb910_placeholders where functionName = ?", "wsDownloadButton", "placeHolderString");
 
         for (int t = 0; t < placeholders.length; t++ ){
             htmlPage = htmlPage.replace(placeholders[t], dataItems[t + 1]);
@@ -47,16 +49,13 @@ public class PrintDesignForm {
         
         htmlPage = htmlPage.replace("hidden hidden", "hidden");
 
-        // sadly the PDF creator is ignoring the "hidden" attributes to avoid unnecessary lines.
-        // So, finally parse the HTML and filter the "hidden" lines manually
-        htmlPage = optimizeHtml(htmlPage);
-
-        fps.writeToAnyFile(sourcePath + trafoNumber + ".html", htmlPage);
-
-        return pg.createPdf(trafoNumber);
+        // sadly the PDF creator is ignoring the "hidden" html attributes to avoid unnecessary lines.
+        // So, finally parse the HTML and filter the "hidden" lines manually by "optimizeHtml"
+        fps.writeToAnyFile(sourcePath + trafoNumber + ".html", optimizeHtml(htmlPage));
+        return downLoadButton.replace(dLButtonPlaceHold, pg.createPdf(trafoNumber));
     }
 
-    public String optimizeHtml(String fullHtml){
+    private String optimizeHtml(String fullHtml){
         String result = "";
         String[] htmlLines = fullHtml.split("\r\n");
         for(int t = 0; t < htmlLines.length; t++){

@@ -14,6 +14,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 public class PdfGenerator {
     String inputPath = "src/main/resources/public/html/";
     String outputPath = "src/main/resources/public/downloads/";
+    String relDownloadPath = "downloads/";
     FuncsAndProcs fps = new FuncsAndProcs();
 
     public String createPdf(String trafoNumber) {
@@ -30,7 +31,7 @@ public class PdfGenerator {
             fps.deleteFile(inputPath + trafoNumber + ".html");
         } catch(Exception e){e.getMessage();}
         
-        return outputPath + trafoNumber + ".pdf";
+        return relDownloadPath + trafoNumber + ".pdf";
     }
 
     private Document parseHtml(File htmlFile) throws IOException{
