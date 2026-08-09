@@ -8,7 +8,8 @@ import java.nio.file.FileSystems;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
-import org.restserver.FuncsAndProcs;
+import org.restserver.common.FuncsAndProcs;
+
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 public class PdfGenerator {

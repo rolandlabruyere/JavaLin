@@ -1,9 +1,9 @@
 package org.restserver.HtmlRenderer;
 import java.sql.SQLException;
 
-import org.restserver.ConstructHtmlPages;
-import org.restserver.DbConnect;
-import org.restserver.FuncsAndProcs;
+import org.restserver.common.FuncsAndProcs;
+import org.restserver.database.DbConnect;
+import org.restserver.htmlConstructor.ConstructHtmlPages;
 
 public class PrintDesignForm {
     FuncsAndProcs       fps = new FuncsAndProcs();

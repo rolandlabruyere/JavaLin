@@ -2,10 +2,16 @@ package org.restserver;
 
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
-import static org.restserver.FuncsAndProcs.decodeBase64;
+
+import static org.restserver.common.FuncsAndProcs.decodeBase64;
+
 import java.sql.SQLException;
 
 import org.restserver.HtmlRenderer.PrintDesignForm;
+import org.restserver.common.FuncsAndProcs;
+import org.restserver.database.DbConnect;
+import org.restserver.htmlConstructor.ConstructHtmlPages;
+import org.restserver.trafoClasses.PowerTrafo;
 
 public class RestServer {
 
