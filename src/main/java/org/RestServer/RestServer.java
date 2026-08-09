@@ -2,16 +2,13 @@ package org.restserver;
 
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
-
-import static org.restserver.common.FuncsAndProcs.decodeBase64;
-
 import java.sql.SQLException;
-
 import org.restserver.HtmlRenderer.PrintDesignForm;
 import org.restserver.common.FuncsAndProcs;
 import org.restserver.database.DbConnect;
 import org.restserver.htmlConstructor.ConstructHtmlPages;
 import org.restserver.trafoClasses.PowerTrafo;
+import static org.restserver.common.FuncsAndProcs.decodeBase64;
 
 public class RestServer {
 
@@ -35,12 +32,12 @@ public class RestServer {
             config.routes.get("/about"                      , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/instellingen"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/powerTrafoLayout/{value}"   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", "").replace(ctx.pathParam("value"), ""), ctx.pathParam("value"))));
+            config.routes.get("/powerTrafoLayout"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("value"))));
             config.routes.get("/prepareSales"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/pdfWikkelschema"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             
             //map post routes
-            config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("values"))));
+            config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
         }).start(7070);
     }
 
