@@ -7,6 +7,7 @@ import org.restserver.HtmlRenderer.PrintDesignForm;
 import org.restserver.common.FuncsAndProcs;
 import org.restserver.database.DbConnect;
 import org.restserver.htmlConstructor.ConstructHtmlPages;
+import org.restserver.maintainSettings.HandleSettings;
 import org.restserver.trafoClasses.PowerTrafo;
 import static org.restserver.common.FuncsAndProcs.decodeBase64;
 
@@ -31,13 +32,15 @@ public class RestServer {
             config.routes.get("/contact"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/about"                      , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/instellingen"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/wijzigInstellingen"         , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/powerTrafoLayout"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("value"))));
             config.routes.get("/prepareSales"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/pdfWikkelschema"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             
-            //map post routes
+            //map post routes saveSettings
             config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
+            config.routes.post("/saveSettings"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
         }).start(7070);
     }
 
@@ -46,6 +49,7 @@ public class RestServer {
         FuncsAndProcs fps = new FuncsAndProcs();
         PowerTrafo pt = new PowerTrafo();
         PrintDesignForm pdf = new PrintDesignForm();
+        HandleSettings hs = new HandleSettings();
         String resultHtml = "";
         ipAddress = decodeBase64(ipAddress);
 
@@ -53,20 +57,23 @@ public class RestServer {
         conn.execSql("insert into voorthuiscustomersales.tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
 
         switch (tabItem) {
-            case "voedingstrafo"    -> resultHtml = getRoot(tabItem);
-            case "smoorspoel"       -> resultHtml = getRoot(tabItem);
-            case "uitgangstrafo"    -> resultHtml = getRoot(tabItem);
-            case "weetjes"          -> resultHtml = getRoot(tabItem);
-            case "zoeken"           -> resultHtml = getRoot(tabItem);
-            case "diversen"         -> resultHtml = getRoot(tabItem);
-            case "contact"          -> resultHtml = getRoot(tabItem); 
-            case "about"            -> resultHtml = getRoot(tabItem);
-            case "instellingen"     -> resultHtml = getRoot(tabItem);
-            case "home"             -> resultHtml = getRoot(tabItem);
-            case "prepareSales"     -> resultHtml = getRoot(tabItem);
-            case "powerTrafoLayout" -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
-            case "powertrafo"       -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
-            case "pdfWikkelschema"  -> resultHtml = pdf.generatePdfDoc(tabItem, ipAddress);
+            case "voedingstrafo"      -> resultHtml = getRoot(tabItem);
+            case "smoorspoel"         -> resultHtml = getRoot(tabItem);
+            case "uitgangstrafo"      -> resultHtml = getRoot(tabItem);
+            case "weetjes"            -> resultHtml = getRoot(tabItem);
+            case "zoeken"             -> resultHtml = getRoot(tabItem);
+            case "diversen"           -> resultHtml = getRoot(tabItem);
+            case "contact"            -> resultHtml = getRoot(tabItem); 
+            case "about"              -> resultHtml = getRoot(tabItem);
+            case "instellingen"       -> resultHtml = hs.getSettings(tabItem, ipAddress);
+            case "wijzigInstellingen" -> resultHtml = getRoot("instellingen");
+            case "home"               -> resultHtml = getRoot(tabItem);
+            case "prepareSales"       -> resultHtml = getRoot(tabItem);
+            case "powerTrafoLayout"   -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
+            case "pdfWikkelschema"    -> resultHtml = pdf.generatePdfDoc(tabItem, ipAddress);
+            //post routes
+            case "powertrafo"         -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
+            case "saveSettings"       -> resultHtml = hs.updateSettings(tabItem, ipAddress, value);
        }
         return resultHtml;
     }

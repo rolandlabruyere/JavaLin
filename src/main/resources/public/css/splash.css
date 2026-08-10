@@ -162,7 +162,7 @@ table{
     margin: 0px auto; 
 }
 input{
-	width: 150px;
+	width: 200px;
 	border: none;
  }
 .header {
@@ -181,6 +181,12 @@ input{
 .cell {
 	border:1px solid grey;
 	color: black;
+	background-color: white;
+	padding: 5px;
+}
+.cellGrey {
+	border:1px solid grey;
+	color: grey;
 	background-color: white;
 	padding: 5px;
 }
