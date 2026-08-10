@@ -41,10 +41,21 @@ public class HandleSettings {
                 }
             }
         }
-        String[] pair = values[values.length - 1].split("=");
-        System.out.println(pair[1]);
 
-        return "update gelukt";
+        String[] pair = values[values.length - 1].split("=");
+
+        conn.execSql("replace into voorthuiscustomersales.tb920_customer_settings values(?, ?, ?, ?, ?, ?)", ipAddress + ";0;0;0;0;" + fps.depositTimestamp(0));
+        
+        for (Integer i = 1; i < 5; i++) {
+            switch (Integer.parseInt(pair[1]) & (int)Math.pow(2, i)) {
+                case 2  -> conn.execSql("update voorthuiscustomersales.tb920_customer_settings set PermissionStoreAddress      = true where ip = ?", ipAddress);
+                case 4  -> conn.execSql("update voorthuiscustomersales.tb920_customer_settings set PermissionStorePaymentStats = true where ip = ? ", ipAddress);
+                case 8  -> conn.execSql("update voorthuiscustomersales.tb920_customer_settings set AgreeShopConditions         = true where ip = ? ", ipAddress);
+                case 16 -> conn.execSql("update voorthuiscustomersales.tb920_customer_settings set ShowInteractiveHelp         = true where ip = ? ", ipAddress);
+            };
+        }
+        //retourneer nu de nieuw opgeslagen settings page
+        return getSettings("instellingen", ipAddress);
     }
     
     private String constructSettingsPage(String htmlPage, String placeholders, String[] values) throws SQLException {
