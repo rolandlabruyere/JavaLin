@@ -26,6 +26,7 @@ public class HandleSettings {
     }
 
     public String updateSettings(String tabItem, String ipAddress, String valuePairs) throws SQLException {
+        String returnPage = "instellingen";
         DbConnect conn = new DbConnect();
         conn.connect(); 
         String[] values = decodeBase64(valuePairs).split("&");
@@ -55,7 +56,7 @@ public class HandleSettings {
             };
         }
         //retourneer nu de nieuw opgeslagen settings page
-        return getSettings("instellingen", ipAddress);
+        return getSettings(returnPage, ipAddress);
     }
     
     private String constructSettingsPage(String htmlPage, String placeholders, String[] values) throws SQLException {

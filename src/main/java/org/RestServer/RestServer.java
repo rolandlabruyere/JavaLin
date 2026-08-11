@@ -38,7 +38,7 @@ public class RestServer {
             config.routes.get("/prepareSales"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/pdfWikkelschema"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             
-            //map post routes saveSettings
+            //map post routes 
             config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
             config.routes.post("/saveSettings"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
         }).start(7070);
