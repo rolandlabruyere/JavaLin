@@ -8,58 +8,54 @@ Items
 const items = [
 {
   name: "home",
-  id:	"homeId",
   color: menuColor,
   href: "#"
 },
 {
   name: "voedingstrafo",
-  id:	"powerTrafoId",
   color: calcColor,
   href: "#" 
 },
 {
   name: "uitgangstrafo",
-  id:	"ouputTrafoId",
   color: calcColor,
   href: "#" 
 },
 {
   name: "smoorspoel",
-  id:	"filterChokeId",
   color: calcColor,
   href: "#" 
 },
 {
   name: "weetjes",
-  id:	"miscId",
   color: menuColor,
   href: "#" 
 },
 {
   name: "diversen",
-  id:	"diversId",
   color: menuColor,
   href: "#" 
 },
 {
   name: "winkelwagen",
-  id:	"shoppingCartId",
   color: menuColor,
   href: "#" 
 },
 {
   name: "zoeken",
-  id:	"searchId",
   color: menuColor,
   href: "#" 
 },
 {
   name: "instellingen",
-  id:	"settings",
   color: settingsColor,
   href: "#" 
-}
+},
+{
+  name: "cookies",
+  color: settingsColor,
+  href: "#" 
+},
 ];
 
 /*--------------------

@@ -9,6 +9,9 @@ sup {
     vertical-align: super;
     font-size: smaller;
 }
+h2 {
+  font-size: 22px;
+}
 .txt {
 	color: rgb(50, 50, 75);
 	text-align: center;
@@ -189,6 +192,7 @@ input{
 	color: black;
 	background-color: white;
 	padding: 5px;
+	vertical-align: top;
 }
 .cellGrey {
 	border:1px solid grey;
