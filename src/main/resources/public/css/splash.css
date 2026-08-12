@@ -9,6 +9,10 @@ sup {
     vertical-align: super;
     font-size: smaller;
 }
+.txt {
+	color: rgb(50, 50, 75);
+	text-align: center;
+}
 .wrapper {
    /* background-color: #d6f7ce;*/
     width: 100%;
@@ -171,12 +175,14 @@ input{
 	background-color: rgb(200, 200, 200);
 	font-style: bold;
 	padding: 5px;
+	width: 50%;
 }
 .rowTitle {
 	border:1px solid grey;
 	color: black;
 	background-color: rgb(220, 220, 235);
 	padding: 5px;
+	text-align: left;
 }
 .cell {
 	border:1px solid grey;

@@ -120,7 +120,8 @@ const Menu = ({ items }) => {
       className: `item ${active === menuIndex ? 'active' : ''}`,
       onMouseEnter: () => {setActive(menuIndex);},
       onClick: () => {
-			htmx.ajax("GET", "/" + item.name, "#contentDiv");
+			var query = "?ipAddress=" + pubIp;
+			htmx.ajax("GET", "/" + item.name + query, "#contentDiv");
             htmx.ajax("GET", "/clear", "#vertMenuDiv");
             htmx.ajax("GET", "/clear", "#infoDiv");
 			objectBin = 1;
