@@ -1,9 +1,10 @@
 package org.restserver.htmlConstructor;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.restserver.common.FuncsAndProcs;
 import org.restserver.database.DbConnect;
+import java.sql.ResultSetMetaData;
 
 public class ConstructHtmlPages {
     FuncsAndProcs fps = new FuncsAndProcs();
@@ -36,6 +37,28 @@ public class ConstructHtmlPages {
             }
         }
         return htmlString;
+    }
+
+    public String constructOpenOrderInfo(String tabItem, String ipAddress) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        myConn.connect(); 
+
+        String mainInfo = getSnippet(tabItem, 0);
+        String snippet = getSnippet(tabItem, 1);
+        String placeHolder = getPlaceholders(tabItem);
+
+        ResultSet openOrders = myConn.openSql("select trafoNum, orderType from voorthuiscustomersales.tb970_active_orders where ip = ? and isOpen = false order by 1, 2" , ipAddress);
+        ResultSetMetaData rsmd = openOrders.getMetaData();
+        String column1 = "$"+ rsmd.getColumnName(1) + "$";
+        String column2 = "$"+ rsmd.getColumnName(2) + "$";
+
+        while (openOrders.next()){
+            String hulp = snippet.replace(column1, openOrders.getString(1));
+            hulp = hulp.replace(column2, openOrders.getString(2)); 
+            mainInfo = mainInfo.replace(placeHolder, hulp);
+        }
+        mainInfo = mainInfo.replace(placeHolder, "");
+        return mainInfo;
     }
 
     private String getSnippet(String tabItem, Integer itemNr) throws SQLException {

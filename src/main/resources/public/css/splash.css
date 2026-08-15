@@ -165,7 +165,11 @@ h2 {
   height: auto;
 }
 table{
-	width: 60%;
+	width: 75%;
+    margin: 0px auto; 
+}
+.weetjesTbl{
+	width: 100%;
     margin: 0px auto; 
 }
 input{

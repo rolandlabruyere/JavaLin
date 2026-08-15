@@ -119,7 +119,7 @@ const Menu = ({ items }) => {
 			var query = "?ipAddress=" + pubIp;
 			htmx.ajax("GET", "/" + item.name + query, "#contentDiv");
             htmx.ajax("GET", "/clear", "#vertMenuDiv");
-            htmx.ajax("GET", "/clear", "#infoDiv");
+            htmx.ajax("GET", "/openstaandeOrders" + query, "#infoDiv");
 			objectBin = 1;
 			savedValues = "";
 		 },

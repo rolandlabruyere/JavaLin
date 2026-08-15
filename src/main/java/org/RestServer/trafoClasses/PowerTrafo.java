@@ -23,6 +23,7 @@ public class PowerTrafo  {
     public String postPowerTrafoSpecs(String tabItem, String ipAddress, String valueString) throws SQLException {
         DbConnect conn = new DbConnect();
         conn.connect(); 
+        String orderType = "PowerTrafo";
         String decodedValues = decodeBase64(valueString);
         String[] values = decodedValues.split("&");
         String trafoNumber = getNextNumber(tabItem);
@@ -33,6 +34,8 @@ public class PowerTrafo  {
 
         //initialize a new power trafo for this ip 
         conn.execSql("insert into voorthuiscustomersales.tb200_power_trafo_config (ip, trafoNum, timestamp) values (?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + fps.depositTimestamp(0));
+        //initialize a new active order entry 
+        conn.execSql("replace into voorthuiscustomersales.tb970_active_orders (ip, trafoNum, OrderType, timestamp) values (?, ?, ?, ?)", ipAddress + ";" + trafoNumber + ";" + orderType + ";" + fps.depositTimestamp(0));
 
         //first insert the boolean values into the database
         for (Integer i = 0; i < 7; i++) {

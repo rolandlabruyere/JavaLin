@@ -29,6 +29,7 @@ public class RestServer {
             config.routes.get("/diversen"                   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/instellingen"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/openstaandeOrders"          , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/pdfWikkelschema"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/powerTrafoLayout"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("value"))));
             config.routes.get("/prepareSales"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
@@ -50,7 +51,9 @@ public class RestServer {
         PowerTrafo pt = new PowerTrafo();
         PrintDesignForm pdf = new PrintDesignForm();
         HandleSettings hs = new HandleSettings();
+        ConstructHtmlPages chp = new ConstructHtmlPages();
         String resultHtml = "";
+
         ipAddress = decodeBase64(ipAddress);
 
         conn.connect(); 
@@ -64,6 +67,7 @@ public class RestServer {
             case "diversen"           -> resultHtml = getRoot(tabItem);
             case "home"               -> resultHtml = getRoot(tabItem);
             case "instellingen"       -> resultHtml = hs.getSettings(tabItem, ipAddress);
+            case "openstaandeOrders"  -> resultHtml = chp.constructOpenOrderInfo(tabItem, ipAddress);
             case "pdfWikkelschema"    -> resultHtml = pdf.generatePdfDoc(tabItem, ipAddress);
             case "powerTrafoLayout"   -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
             case "prepareSales"       -> resultHtml = getRoot(tabItem);
