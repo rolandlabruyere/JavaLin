@@ -46,6 +46,10 @@ public class FuncsAndProcs {
         return new String(encodedBytes);
     }
 
+    public String decode_Base64(String encodedString){
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+        return new String(decodedBytes);
+    }
 
     public String getLogPath() {
         try{

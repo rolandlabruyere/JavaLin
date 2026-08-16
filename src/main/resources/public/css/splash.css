@@ -198,6 +198,24 @@ input{
 	padding: 5px;
 	vertical-align: top;
 }
+.sideRowTitle {
+	border: 5px solid rgb(29, 109, 116);
+	border-radius: 5px;
+	color: white;
+	background-color: rgb(29, 109, 116);
+	padding: 5px;
+	text-align: left;
+	font-size: 14px;
+}
+.sideCell {
+	border: 5px solid rgb(29, 109, 116);
+	border-radius: 5px;
+	color: white;
+	background-color: rgb(29, 109, 116);
+	padding: 5px;
+	vertical-align: top;
+	font-size: 14px;
+}
 .cellGrey {
 	border:1px solid grey;
 	color: grey;

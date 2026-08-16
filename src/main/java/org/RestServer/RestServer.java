@@ -28,15 +28,20 @@ public class RestServer {
             config.routes.get("/cookies"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/diversen"                   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/homeHist"                   , ctx -> ctx.html(""));
             config.routes.get("/instellingen"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/openstaandeOrders"          , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/opgeslagenTrafo"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("trafoNum"))));
             config.routes.get("/pdfWikkelschema"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/powerTrafoLayout"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("value"))));
             config.routes.get("/prepareSales"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/smoorspoel"                 , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/smoorspoelHist"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/uitgangstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/uitgangstrafoHist"          , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/voedingstrafo"              , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/voedingstrafoHist"          , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/weetjes"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/weetjesHist"                , ctx -> ctx.html(""));
             config.routes.get("/wijzigInstellingen"         , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/zoeken"                     , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));            
             //map post routes 
@@ -57,7 +62,7 @@ public class RestServer {
         ipAddress = decodeBase64(ipAddress);
 
         conn.connect(); 
-        conn.execSql("insert into voorthuiscustomersales.tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
+        conn.execSql("replace into voorthuiscustomersales.tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
 
         switch (tabItem) {
 
@@ -67,18 +72,22 @@ public class RestServer {
             case "diversen"           -> resultHtml = getRoot(tabItem);
             case "home"               -> resultHtml = getRoot(tabItem);
             case "instellingen"       -> resultHtml = hs.getSettings(tabItem, ipAddress);
-            case "openstaandeOrders"  -> resultHtml = chp.constructOpenOrderInfo(tabItem, ipAddress);
+            case "opgeslagenTrafo"    -> resultHtml = chp.getHistTrafo(ipAddress, value);
             case "pdfWikkelschema"    -> resultHtml = pdf.generatePdfDoc(tabItem, ipAddress);
             case "powerTrafoLayout"   -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
             case "prepareSales"       -> resultHtml = getRoot(tabItem);
             case "smoorspoel"         -> resultHtml = getRoot(tabItem);
+            case "smoorspoelHist"     -> resultHtml = chp.constructOpenOrderInfo(tabItem, ipAddress);
             case "uitgangstrafo"      -> resultHtml = getRoot(tabItem);
+            case "uitgangstrafoHist"  -> resultHtml = chp.constructOpenOrderInfo(tabItem, ipAddress);
             case "voedingstrafo"      -> resultHtml = getRoot(tabItem);
+            case "voedingstrafoHist"  -> resultHtml = chp.constructOpenOrderInfo(tabItem, ipAddress);
             case "weetjes"            -> resultHtml = getRoot(tabItem);
             case "wijzigInstellingen" -> resultHtml = getRoot("instellingen");
             case "zoeken"             -> resultHtml = getRoot(tabItem);            //post routes
             case "powertrafo"         -> resultHtml = pt.postPowerTrafoSpecs(tabItem, ipAddress, value);
             case "saveSettings"       -> resultHtml = hs.updateSettings(tabItem, ipAddress, value);
+            default                   -> resultHtml = "";
        }
         return resultHtml;
     }

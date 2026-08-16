@@ -61,6 +61,14 @@ public class ConstructHtmlPages {
         return mainInfo;
     }
 
+    public String getHistTrafo(String ipAddress, String trafoNumber) throws SQLException {
+        DbConnect myConn = new DbConnect();
+        myConn.connect();
+        String result = myConn.fetchSql("select * from voorthuiscustomersales.tb940_save_html_doc where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber, "htmlDoc"); 
+
+        return fps.decode_Base64(result);
+    }
+
     private String getSnippet(String tabItem, Integer itemNr) throws SQLException {
         DbConnect myConn = new DbConnect();
         myConn.connect(); 

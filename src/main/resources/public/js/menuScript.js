@@ -1,7 +1,7 @@
 const { useRef, useState, useEffect, createRef } = React;
-const menuColor = "#1d6d74";
-const calcColor = "#dd6d74";
-const settingsColor = "#84cc4d";
+const menuColor = "rgb(29, 109, 116)";
+const calcColor = "rgb(29, 109, 116)";
+const settingsColor = "rgb(29, 109, 116)";
 /*--------------------
 Items
 --------------------*/
@@ -119,7 +119,7 @@ const Menu = ({ items }) => {
 			var query = "?ipAddress=" + pubIp;
 			htmx.ajax("GET", "/" + item.name + query, "#contentDiv");
             htmx.ajax("GET", "/clear", "#vertMenuDiv");
-            htmx.ajax("GET", "/openstaandeOrders" + query, "#infoDiv");
+            htmx.ajax("GET", "/" + item.name + "Hist" + query, "#infoDiv");
 			objectBin = 1;
 			savedValues = "";
 		 },
