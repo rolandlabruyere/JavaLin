@@ -46,27 +46,35 @@ public class ConstructHtmlPages {
         String mainInfo = getSnippet(tabItem, 0);
         String snippet = getSnippet(tabItem, 1);
         String placeHolder = getPlaceholders(tabItem);
+        String countQuery = "select count(*) as recordCount from voorthuiscustomersales.tb970_active_orders where ip = ? and isOpen = false";
+        String selectQuery = "select trafoNum, orderType from voorthuiscustomersales.tb970_active_orders where ip = ? and isOpen = false  order by 1, 2";
+        
+        if (Integer.parseInt(myConn.fetchSql(countQuery, ipAddress, "recordCount")) > 0){
+            ResultSet openOrders = myConn.openSql(selectQuery, ipAddress);
+            ResultSetMetaData rsmd = openOrders.getMetaData();
+            String column1 = "$"+ rsmd.getColumnName(1) + "$";
+            String column2 = "$"+ rsmd.getColumnName(2) + "$";
 
-        ResultSet openOrders = myConn.openSql("select trafoNum, orderType from voorthuiscustomersales.tb970_active_orders where ip = ? and isOpen = false order by 1, 2" , ipAddress);
-        ResultSetMetaData rsmd = openOrders.getMetaData();
-        String column1 = "$"+ rsmd.getColumnName(1) + "$";
-        String column2 = "$"+ rsmd.getColumnName(2) + "$";
-
-        while (openOrders.next()){
-            String hulp = snippet.replace(column1, openOrders.getString(1));
-            hulp = hulp.replace(column2, openOrders.getString(2)); 
-            mainInfo = mainInfo.replace(placeHolder, hulp);
+            while (openOrders.next()){
+                String hulp = snippet.replace(column1, openOrders.getString(1));
+                hulp = hulp.replace(column2, openOrders.getString(2).toLowerCase()); 
+                mainInfo = mainInfo.replace(placeHolder, hulp);
+            }
+            mainInfo = mainInfo.replace(placeHolder, "");
+            return mainInfo;
+        } else{
+            return "";
         }
-        mainInfo = mainInfo.replace(placeHolder, "");
-        return mainInfo;
     }
 
-    public String getHistTrafo(String ipAddress, String trafoNumber) throws SQLException {
+    public String getHistTrafo(String tabItem, String ipAddress, String trafoNumber) throws SQLException {
         DbConnect myConn = new DbConnect();
         myConn.connect();
         String result = myConn.fetchSql("select * from voorthuiscustomersales.tb940_save_html_doc where ip = ? and trafoNum = ?", ipAddress + ";" + trafoNumber, "htmlDoc"); 
+        result = fps.decode_Base64(result);
+        result = result.replace(getPlaceholders(tabItem), getSnippet(tabItem, 0));
 
-        return fps.decode_Base64(result);
+        return result;
     }
 
     private String getSnippet(String tabItem, Integer itemNr) throws SQLException {

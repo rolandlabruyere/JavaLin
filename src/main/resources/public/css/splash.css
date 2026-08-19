@@ -80,7 +80,6 @@ h2 {
 	left: -180px;
 	top: 0px;
 	width: 300px;
-	font-style: italic;
 	vertical-align: text-top;
 }
 .contentDiv {
@@ -198,23 +197,23 @@ input{
 	padding: 5px;
 	vertical-align: top;
 }
-.sideRowTitle {
-	border: 5px solid rgb(29, 109, 116);
-	border-radius: 5px;
-	color: white;
-	background-color: rgb(29, 109, 116);
-	padding: 5px;
-	text-align: left;
-	font-size: 14px;
+
+.menuCells {
+  border:5px solid rgb(29, 109, 116);
+  background: rgb(29, 109, 116);
+  padding: 5px;
+  cursor: pointer;
+  color: white;
 }
+
 .sideCell {
-	border: 5px solid rgb(29, 109, 116);
-	border-radius: 5px;
+	width: 250px;
+	border: 5px solid rgb(116, 29, 109);
 	color: white;
-	background-color: rgb(29, 109, 116);
+	background: rgb(116, 29, 109);
 	padding: 5px;
-	vertical-align: top;
 	font-size: 14px;
+	cursor: pointer;
 }
 .cellGrey {
 	border:1px solid grey;
@@ -253,7 +252,6 @@ button{
 
 .menuCells {
   border:5px solid rgb(29, 109, 116);
-  border-radius: 5px;
   background: rgb(29, 109, 116);
   padding: 5px;
   cursor: pointer;
@@ -264,7 +262,6 @@ button{
 	background-color: rgb(00, 123, 255); 
 	color: white; 
 	text-decoration: none; 
-	border-radius: 5px;
 }
 .showButton {
 	padding: 10px 10px; 

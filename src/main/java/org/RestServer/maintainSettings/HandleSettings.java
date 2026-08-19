@@ -30,6 +30,11 @@ public class HandleSettings {
         DbConnect conn = new DbConnect();
         conn.connect(); 
         String[] values = decodeBase64(valuePairs).split("&");
+        
+        //write initial records in both tables
+        conn.execSql("insert into voorthuiscustomersales.tb930_grid_settings_per_ip (ip, timestamp) values(?, ?)", ipAddress + ";" + fps.depositTimestamp(0)); 
+        conn.execSql("insert into voorthuiscustomersales.tb110_address (ip, timestamp) values(?, ?)", ipAddress + ";" + fps.depositTimestamp(0)); 
+
         for (int t = 0; t < values.length - 1; t++){
             switch (t){
                 case 0, 1 -> {

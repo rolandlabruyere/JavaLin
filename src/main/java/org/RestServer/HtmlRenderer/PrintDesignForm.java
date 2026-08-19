@@ -1,6 +1,6 @@
 package org.restserver.HtmlRenderer;
-import java.sql.SQLException;
 
+import java.sql.SQLException;
 import org.restserver.common.FuncsAndProcs;
 import org.restserver.database.DbConnect;
 import org.restserver.htmlConstructor.ConstructHtmlPages;

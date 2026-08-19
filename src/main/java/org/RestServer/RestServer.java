@@ -26,10 +26,13 @@ public class RestServer {
             config.routes.get("/clear"                      , ctx -> ctx.html(""));
             config.routes.get("/contact"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/cookies"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/cookiesHist"                , ctx -> ctx.html(""));
             config.routes.get("/diversen"                   , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/diversenHist"               , ctx -> ctx.html(""));
             config.routes.get("/home"                       , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/homeHist"                   , ctx -> ctx.html(""));
             config.routes.get("/instellingen"               , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
+            config.routes.get("/instellingenHist"           , ctx -> ctx.html(""));
             config.routes.get("/opgeslagenTrafo"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("trafoNum"))));
             config.routes.get("/pdfWikkelschema"            , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/powerTrafoLayout"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("value"))));
@@ -43,7 +46,9 @@ public class RestServer {
             config.routes.get("/weetjes"                    , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
             config.routes.get("/weetjesHist"                , ctx -> ctx.html(""));
             config.routes.get("/wijzigInstellingen"         , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));
-            config.routes.get("/zoeken"                     , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));            
+            config.routes.get("/zoeken"                     , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), "")));    
+            config.routes.get("/zoekenHist"                 , ctx -> ctx.html(""));
+        
             //map post routes 
             config.routes.post("/powertrafo"             , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
             config.routes.post("/saveSettings"           , ctx -> ctx.html(trackSession(ctx.queryParam("ipAddress"), ctx.path().replace("/", ""), ctx.queryParam("savedValues"))));
@@ -62,17 +67,16 @@ public class RestServer {
         ipAddress = decodeBase64(ipAddress);
 
         conn.connect(); 
-        conn.execSql("replace into voorthuiscustomersales.tb980_session_tracker (ipAddress, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
+        conn.execSql("replace into voorthuiscustomersales.tb980_session_tracker (ip, timestamp, visitedPage) values (?, ?, ?)", ipAddress + ";" + fps.depositTimestamp(0) + ";" + tabItem);
 
         switch (tabItem) {
-
             case "about"              -> resultHtml = getRoot(tabItem);
             case "contact"            -> resultHtml = getRoot(tabItem); 
             case "cookies"            -> resultHtml = getRoot(tabItem); 
             case "diversen"           -> resultHtml = getRoot(tabItem);
             case "home"               -> resultHtml = getRoot(tabItem);
             case "instellingen"       -> resultHtml = hs.getSettings(tabItem, ipAddress);
-            case "opgeslagenTrafo"    -> resultHtml = chp.getHistTrafo(ipAddress, value);
+            case "opgeslagenTrafo"    -> resultHtml = chp.getHistTrafo(tabItem, ipAddress, value);
             case "pdfWikkelschema"    -> resultHtml = pdf.generatePdfDoc(tabItem, ipAddress);
             case "powerTrafoLayout"   -> resultHtml = pt.powerTrafoLayout(tabItem, ipAddress, Integer.valueOf(value));
             case "prepareSales"       -> resultHtml = getRoot(tabItem);
